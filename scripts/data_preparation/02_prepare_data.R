@@ -42,6 +42,7 @@ prepared_data$PhysHlth_categoriale <- cut(
   right = FALSE
 )
 
+prepared_data <- prepared_data[, !(names(prepared_data) %in% c("BMI", "MentHlth", "PhysHlth"))]
 
 write.csv(prepared_data, processed_data_path, row.names = FALSE)
 cat("Dataset processato salvato in:", processed_data_path, "\n")
