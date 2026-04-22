@@ -47,3 +47,16 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Project-local R library
+ambiente_progettodallavalle/
+
+# Local VS Code settings
+.vscode/settings.json
+
+# Project outputs
+models/*.rds
+reports/figures/*
+!reports/figures/.gitkeep
+reports/results/*
+!reports/results/.gitkeep
