@@ -26,12 +26,13 @@ install.packages("readr", lib = .libPaths()[1])
 2. Esplorare e pulire i dati con gli script in `scripts/data_preparation/`.
 3. Addestrare i modelli con gli script in `scripts/modeling/`.
 4. Valutare i risultati con gli script in `scripts/evaluation/`.
-5. Salvare output, metriche e grafici nelle cartelle `models/`, `reports/figures/` e `reports/results/`.
+5. Salvare output, metriche e grafici nelle cartelle `models/`, `reports/analisi_esplorativa/` e `reports/results/`.
 
 ## Struttura del progetto
 
 - `.Rprofile`: attiva automaticamente la libreria locale del progetto.
 - `project/`: configurazione condivisa del progetto.
+  Include `config.R` con i percorsi condivisi del progetto.
 - `data/raw/`: dati originali.
 - `data/processed/`: dati puliti o trasformati.
 - `scripts/data_preparation/`: import, pulizia, feature engineering.
@@ -39,6 +40,6 @@ install.packages("readr", lib = .libPaths()[1])
 - `scripts/evaluation/`: metriche, grafici e validazione.
 - `scripts/utils/`: funzioni riutilizzabili.
 - `models/`: modelli salvati.
-- `reports/figures/`: grafici.
+- `reports/analisi_esplorativa/`: output dell'analisi esplorativa, incluse figure e file Excel.
 - `reports/results/`: tabelle, metriche e output finali.
 - `ambiente_progettodallavalle/`: libreria locale R esclusa da Git.

@@ -1,8 +1,11 @@
-raw_data_path <- "data/raw/diabetes_binary_5050split_health_indicators_BRFSS2015.csv"
-correlation_plot_path <- "reports/figures/correlations/correlation_heatmap.png"
-distribution_plots_dir <- "reports/figures/distributions"
-variable_modality_percentages_path <- "reports/results/variable_modality_percentages.xlsx"
-binary_imbalanced_covariates_path <- "reports/results/binary_imbalanced_covariates.xlsx"
+source("project/config.R")
+paths <- project_paths
+
+raw_data_path <- paths$raw_data_path
+correlation_plot_path <- paths$correlation_plot_path
+distribution_plots_dir <- paths$distribution_plots_dir
+variable_modality_percentages_path <- paths$variable_modality_percentages_path
+binary_imbalanced_covariates_path <- paths$binary_imbalanced_covariates_path
 
 if (!file.exists(raw_data_path)) {
   stop("Dataset non trovato in: ", raw_data_path)
@@ -11,6 +14,7 @@ if (!file.exists(raw_data_path)) {
 library(ggplot2)
 library(openxlsx)
 
+# Toggle sections of the exploratory analysis script on or off.
 show_dataset_dimensions <- FALSE
 show_variable_names <- FALSE
 show_dataset_structure <- FALSE
@@ -385,4 +389,3 @@ if (export_binary_imbalanced_covariates) {
   saveWorkbook(imbalanced_workbook, file = binary_imbalanced_covariates_path, overwrite = TRUE)
   cat("\nFile Excel delle covariate binarie sbilanciate salvato in:", binary_imbalanced_covariates_path, "\n")
 }
-

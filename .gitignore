@@ -56,7 +56,9 @@ ambiente_progettodallavalle/
 
 # Project outputs
 models/*.rds
-reports/figures/*
-!reports/figures/.gitkeep
+reports/analisi_esplorativa/figures/*
+!reports/analisi_esplorativa/figures/.gitkeep
+!reports/analisi_esplorativa/figures/correlations/
+!reports/analisi_esplorativa/figures/distributions/
 reports/results/*
 !reports/results/.gitkeep
