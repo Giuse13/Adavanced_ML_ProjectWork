@@ -7,6 +7,25 @@ if (!file.exists(raw_data_path)) {
 
 data <- read.csv(raw_data_path)
 
+
+[]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Placeholder per pulizia dati e feature engineering.
 prepared_data <- data
 
