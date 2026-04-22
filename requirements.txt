@@ -1,0 +1,3 @@
+# R package requirements used by the project so far
+ggplot2==3.4.3
+openxlsx==4.2.8.1
