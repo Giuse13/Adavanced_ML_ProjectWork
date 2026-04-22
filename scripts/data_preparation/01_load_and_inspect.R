@@ -23,9 +23,33 @@ if (ncol(numeric_data) < 2) {
   cat("\nVariabili numeriche insufficienti per calcolare la matrice di correlazione.\n")
 } else {
   correlation_matrix <- cor(numeric_data, use = "pairwise.complete.obs")
+  upper_triangle_values <- correlation_matrix[upper.tri(correlation_matrix)]
+  thresholds <- c(0.3, 0.4, 0.5, 0.6)
+  correlation_pairs <- as.data.frame(as.table(correlation_matrix))
+  names(correlation_pairs) <- c("Variable_1", "Variable_2", "Correlation")
+  correlation_pairs <- correlation_pairs[correlation_pairs$Variable_1 != correlation_pairs$Variable_2, ]
+  correlation_pairs <- correlation_pairs[as.character(correlation_pairs$Variable_1) < as.character(correlation_pairs$Variable_2), ]
+  strong_pairs <- correlation_pairs[abs(correlation_pairs$Correlation) > 0.3, ]
+  strong_pairs <- strong_pairs[order(-abs(strong_pairs$Correlation)), ]
 
-  cat("\nMatrice di correlazione tra variabili numeriche:\n")
-  print(round(correlation_matrix, 3))
+  cat("\nConteggio delle correlazioni sopra soglia:\n")
+  for (threshold in thresholds) {
+    count_above_threshold <- sum(abs(upper_triangle_values) > threshold, na.rm = TRUE)
+    cat("Numero di correlazioni con coeff >", threshold, "e':", count_above_threshold, "\n")
+  }
+
+  cat("\nCoppie di variabili con correlazione maggiore di 0.3 in valore assoluto:\n")
+  if (nrow(strong_pairs) == 0) {
+    cat("Nessuna coppia con correlazione maggiore di 0.3.\n")
+  } else {
+    for (row_index in seq_len(nrow(strong_pairs))) {
+      cat(
+        as.character(strong_pairs$Variable_1[row_index]), "<->",
+        as.character(strong_pairs$Variable_2[row_index]),
+        ": coefficiente =", sprintf("%.3f", strong_pairs$Correlation[row_index]), "\n"
+      )
+    }
+  }
 
   dir.create(dirname(correlation_plot_path), recursive = TRUE, showWarnings = FALSE)
 
@@ -73,3 +97,4 @@ if (ncol(numeric_data) < 2) {
 
   cat("\nHeatmap salvata in:", correlation_plot_path, "\n")
 }
+
