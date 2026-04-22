@@ -10,8 +10,14 @@ if (!file.exists(raw_data_path)) {
 
 data <- read.csv(raw_data_path)
 
-# Placeholder per pulizia dati e feature engineering.
 prepared_data <- data
+prepared_data$BMI_categoriale <- cut(
+  prepared_data$BMI,
+  breaks = c(-Inf, 18.5, 25, 30, Inf),
+  labels = c("sottopeso", "normopeso", "sovrappeso", "obesita"),
+  right = FALSE
+)
+
 
 write.csv(prepared_data, processed_data_path, row.names = FALSE)
 cat("Dataset processato salvato in:", processed_data_path, "\n")

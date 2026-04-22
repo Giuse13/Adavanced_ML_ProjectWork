@@ -21,7 +21,7 @@ show_dataset_structure <- FALSE
 show_na_count_per_variable <- FALSE
 generate_distribution_plots <- FALSE
 show_correlation_threshold_counts <- FALSE
-show_strong_correlation_pairs <- FALSE
+show_strong_correlation_pairs <- TRUE
 save_correlation_heatmap <- FALSE
 report_variable_modality_percentages <- FALSE
 export_binary_imbalanced_covariates <- FALSE
