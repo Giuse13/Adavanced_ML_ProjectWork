@@ -46,3 +46,27 @@ prepared_data <- prepared_data[, !(names(prepared_data) %in% c("BMI", "MentHlth"
 
 write.csv(prepared_data, processed_data_path, row.names = FALSE)
 cat("Dataset processato salvato in:", processed_data_path, "\n")
+
+set.seed(123)
+
+n_obs <- nrow(prepared_data)
+shuffled_indices <- sample(n_obs)
+
+train_end <- floor(0.70 * n_obs)
+validation_end <- train_end + floor(0.20 * n_obs)
+
+training_set <- prepared_data[shuffled_indices[1:train_end], ]
+validation_set <- prepared_data[shuffled_indices[(train_end + 1):validation_end], ]
+test_set <- prepared_data[shuffled_indices[(validation_end + 1):n_obs], ]
+
+training_set_path <- file.path("data", "processed", "training_set.csv")
+validation_set_path <- file.path("data", "processed", "validation_set.csv")
+test_set_path <- file.path("data", "processed", "test_set.csv")
+
+write.csv(training_set, training_set_path, row.names = FALSE)
+write.csv(validation_set, validation_set_path, row.names = FALSE)
+write.csv(test_set, test_set_path, row.names = FALSE)
+
+cat("Training set salvato in:", training_set_path, "\n")
+cat("Validation set salvato in:", validation_set_path, "\n")
+cat("Test set salvato in:", test_set_path, "\n")
