@@ -1,5 +1,6 @@
 raw_data_path <- "data/raw/diabetes_binary_5050split_health_indicators_BRFSS2015.csv"
-correlation_plot_path <- "reports/figures/correlation_heatmap.png"
+correlation_plot_path <- "reports/figures/correlations/correlation_heatmap.png"
+distribution_plots_dir <- "reports/figures/distributions"
 
 if (!file.exists(raw_data_path)) {
   stop("Dataset non trovato in: ", raw_data_path)
@@ -18,6 +19,60 @@ cat("\nStruttura:\n")
 str(data)
 cat("\nNumero di NA per variabile:\n")
 print(na_count_per_variable)
+
+dir.create(distribution_plots_dir, recursive = TRUE, showWarnings = FALSE)
+
+for (variable_name in names(data)) {
+  variable_data <- data[[variable_name]]
+  plot_data <- data.frame(value = variable_data)
+  unique_values <- unique(variable_data[!is.na(variable_data)])
+  sanitized_name <- gsub("[^A-Za-z0-9_]+", "_", variable_name)
+  output_path <- file.path(distribution_plots_dir, paste0(sanitized_name, "_distribution.png"))
+
+  if (length(unique_values) <= 10) {
+    distribution_plot <- ggplot(plot_data, aes(x = factor(value))) +
+      geom_bar(fill = "#1f4e79", color = "white", linewidth = 0.3) +
+      labs(
+        title = paste("Distribuzione di", variable_name),
+        x = variable_name,
+        y = "Frequenza"
+      ) +
+      theme_minimal(base_size = 13) +
+      theme(
+        panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.background = element_rect(fill = "white", color = NA),
+        plot.background = element_rect(fill = "white", color = NA),
+        plot.title = element_text(face = "bold", size = 16),
+        axis.text.x = element_text(angle = 45, hjust = 1)
+      )
+  } else {
+    distribution_plot <- ggplot(plot_data, aes(x = value)) +
+      geom_histogram(bins = 30, fill = "#1f4e79", color = "white", linewidth = 0.3) +
+      labs(
+        title = paste("Distribuzione di", variable_name),
+        x = variable_name,
+        y = "Frequenza"
+      ) +
+      theme_minimal(base_size = 13) +
+      theme(
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white", color = NA),
+        plot.background = element_rect(fill = "white", color = NA),
+        plot.title = element_text(face = "bold", size = 16)
+      )
+  }
+
+  ggsave(
+    filename = output_path,
+    plot = distribution_plot,
+    width = 8,
+    height = 6,
+    dpi = 300
+  )
+}
+
+cat("\nGrafici di distribuzione salvati in:", distribution_plots_dir, "\n")
 
 if (ncol(numeric_data) < 2) {
   cat("\nVariabili numeriche insufficienti per calcolare la matrice di correlazione.\n")
@@ -98,3 +153,6 @@ if (ncol(numeric_data) < 2) {
   cat("\nHeatmap salvata in:", correlation_plot_path, "\n")
 }
 
+
+
+# continuare analisi esplorativa: check variabili sbilanciate 
