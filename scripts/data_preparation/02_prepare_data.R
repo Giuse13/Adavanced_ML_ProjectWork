@@ -3,6 +3,10 @@ paths <- project_paths
 
 raw_data_path <- paths$raw_data_path
 processed_data_path <- paths$processed_data_path
+training_set_path <- paths$training_set_path
+validation_set_path <- paths$validation_set_path
+test_set_path <- paths$test_set_path
+full_training_set_path <- paths$full_training_set_path
 
 if (!file.exists(raw_data_path)) {
   stop("Dataset non trovato in: ", raw_data_path)
@@ -61,14 +65,14 @@ training_set <- prepared_data[shuffled_indices[1:train_end], ]
 validation_set <- prepared_data[shuffled_indices[(train_end + 1):validation_end], ]
 test_set <- prepared_data[shuffled_indices[(validation_end + 1):n_obs], ]
 
-training_set_path <- file.path("data", "processed", "training_set.csv")
-validation_set_path <- file.path("data", "processed", "validation_set.csv")
-test_set_path <- file.path("data", "processed", "test_set.csv")
-
 write.csv(training_set, training_set_path, row.names = FALSE)
 write.csv(validation_set, validation_set_path, row.names = FALSE)
 write.csv(test_set, test_set_path, row.names = FALSE)
 
+full_training_set <- rbind(training_set, validation_set)
+write.csv(full_training_set, full_training_set_path, row.names = FALSE)
+
 cat("Training set salvato in:", training_set_path, "\n")
 cat("Validation set salvato in:", validation_set_path, "\n")
 cat("Test set salvato in:", test_set_path, "\n")
+cat("Full training set salvato in:", full_training_set_path, "\n")
