@@ -79,7 +79,27 @@ compute_node_levels <- function(nodes, arcs) {
   node_levels
 }
 
-compute_node_coordinates <- function(nodes, arcs) {
+compute_distances <- function(start_node, adjacency_map) {
+  distances <- stats::setNames(rep(Inf, length(adjacency_map)), names(adjacency_map))
+  distances[start_node] <- 0
+  processing_queue <- start_node
+
+  while (length(processing_queue) > 0) {
+    current_node <- processing_queue[1]
+    processing_queue <- processing_queue[-1]
+
+    for (neighbor in adjacency_map[[current_node]]) {
+      if (is.infinite(distances[neighbor])) {
+        distances[neighbor] <- distances[current_node] + 1
+        processing_queue <- c(processing_queue, neighbor)
+      }
+    }
+  }
+
+  distances
+}
+
+compute_node_coordinates <- function(nodes, arcs, focus_node = NULL) {
   node_levels <- compute_node_levels(nodes, arcs)
   layer_indices <- split(names(node_levels), node_levels)
   sorted_layers <- sort(as.integer(names(layer_indices)))
@@ -95,8 +115,43 @@ compute_node_coordinates <- function(nodes, arcs) {
       incoming_map[[to_node]] <- c(incoming_map[[to_node]], from_node)
     }
   }
-  layer_membership <- layer_indices
-  ordered_layer_keys <- as.character(sorted_layers)
+
+  if (!is.null(focus_node) && focus_node %in% nodes) {
+    distance_to_focus <- compute_distances(focus_node, incoming_map)
+    distance_from_focus <- compute_distances(focus_node, outgoing_map)
+    relative_positions <- stats::setNames(rep(NA_real_, length(nodes)), nodes)
+
+    relative_positions[focus_node] <- 0
+
+    ancestor_nodes <- names(distance_to_focus[is.finite(distance_to_focus) & distance_to_focus > 0])
+    descendant_nodes <- names(distance_from_focus[is.finite(distance_from_focus) & distance_from_focus > 0])
+
+    if (length(ancestor_nodes) > 0) {
+      relative_positions[ancestor_nodes] <- -distance_to_focus[ancestor_nodes]
+    }
+
+    if (length(descendant_nodes) > 0) {
+      relative_positions[descendant_nodes] <- distance_from_focus[descendant_nodes]
+    }
+
+    unresolved_nodes <- names(relative_positions[is.na(relative_positions)])
+    if (length(unresolved_nodes) > 0) {
+      fallback_offsets <- node_levels[unresolved_nodes] - node_levels[focus_node]
+
+      if (all(fallback_offsets == 0)) {
+        fallback_offsets <- seq_along(unresolved_nodes)
+      }
+
+      relative_positions[unresolved_nodes] <- fallback_offsets
+    }
+
+    unique_positions <- sort(unique(relative_positions))
+    layer_membership <- split(names(relative_positions), as.character(relative_positions))
+    ordered_layer_keys <- as.character(unique_positions)
+  } else {
+    layer_membership <- layer_indices
+    ordered_layer_keys <- as.character(sorted_layers)
+  }
 
   ordered_layers <- list()
   order_scores <- stats::setNames(rep(0, length(nodes)), nodes)
@@ -133,8 +188,20 @@ compute_node_coordinates <- function(nodes, arcs) {
   }
 
   max_layer_size <- max(lengths(ordered_layers))
-  layer_spacing_x <- if (length(ordered_layer_keys) <= 3) 2.8 else 2.35
-  row_spacing_y <- if (max_layer_size <= 5) 2.2 else 1.7
+  layer_spacing_x <- if (length(ordered_layer_keys) <= 3) {
+    3.0
+  } else if (length(ordered_layer_keys) <= 5) {
+    2.8
+  } else {
+    2.55
+  }
+  row_spacing_y <- if (max_layer_size <= 5) {
+    2.45
+  } else if (max_layer_size <= 8) {
+    2.0
+  } else {
+    1.75
+  }
   coordinates <- list()
 
   for (layer_idx in seq_along(ordered_layer_keys)) {
@@ -167,12 +234,12 @@ compute_node_coordinates <- function(nodes, arcs) {
 }
 
 draw_dag_plot <- function(nodes, arcs, main_title) {
-  layout_info <- compute_node_coordinates(nodes, arcs)
+  layout_info <- compute_node_coordinates(nodes, arcs, focus_node = "Diabetes_binary")
   coordinates <- layout_info$coordinates
-  x_padding <- 1.2
-  y_padding <- 1.3
-  node_width <- 0.72
-  node_height <- 0.42
+  x_padding <- 1.35
+  y_padding <- 1.45
+  node_width <- 0.68
+  node_height <- 0.40
 
   format_node_label <- function(node_name) {
     pretty_name <- gsub("_categoriale$", "\n(categoriale)", node_name)
@@ -189,7 +256,7 @@ draw_dag_plot <- function(nodes, arcs, main_title) {
   plot(
     NA,
     xlim = c(1 - x_padding, layout_info$max_x + x_padding),
-    ylim = c(-0.8, layout_info$max_y + y_padding),
+    ylim = c(-1.1, layout_info$max_y + y_padding),
     xaxt = "n",
     yaxt = "n",
     xlab = "",
@@ -221,7 +288,7 @@ draw_dag_plot <- function(nodes, arcs, main_title) {
         x1 = to_coord["x"] - node_width,
         y1 = to_coord["y"],
         length = 0.075,
-        lwd = 1.1,
+        lwd = 1.0,
         col = "#667085"
       )
     }
@@ -251,7 +318,7 @@ draw_dag_plot <- function(nodes, arcs, main_title) {
       x = coord["x"],
       y = coord["y"],
       labels = format_node_label(node_name),
-      cex = 0.66,
+      cex = 0.64,
       font = if (node_name == "Diabetes_binary") 2 else 1
     )
   }
@@ -267,7 +334,7 @@ draw_dag_plot <- function(nodes, arcs, main_title) {
 }
 
 save_dag_plot <- function(file_path, nodes_to_plot, arcs_to_plot, plot_title) {
-  svg(filename = file_path, width = 16, height = 10.8, bg = "white")
+  svg(filename = file_path, width = 18, height = 11.5, bg = "white")
 
   on.exit(dev.off(), add = TRUE)
 
