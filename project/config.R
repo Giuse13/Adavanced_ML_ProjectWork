@@ -21,6 +21,7 @@ project_paths <- list(
   dag_bic_markov_blanket_selected_vars_path = "reports/dag/bic/dag_markov_blanket_selected_variables.csv",
   dag_bic_markov_blanket_excluded_vars_path = "reports/dag/bic/dag_markov_blanket_excluded_variables.csv",
   dag_bic_config_comparison_path = "reports/dag/bic/dag_configuration_comparison.csv",
+  dag_variable_selection_comparison_xlsx_path = "reports/dag/variable_selection_aic_vs_bic.xlsx",
   correlation_plot_path = "reports/analisi_esplorativa/figures/correlations/correlation_heatmap.png",
   distribution_plots_dir = "reports/analisi_esplorativa/figures/distributions",
   variable_modality_percentages_path = "reports/analisi_esplorativa/variable_modality_percentages.xlsx",
