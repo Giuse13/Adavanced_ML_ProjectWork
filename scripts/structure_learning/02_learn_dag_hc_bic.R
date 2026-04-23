@@ -3,14 +3,14 @@ source("project/config.R")
 paths <- project_paths
 
 training_set_path <- paths$training_set_path
-dag_aic_dir <- paths$dag_aic_dir
-dag_model_path <- paths$dag_model_path
-dag_arcs_path <- paths$dag_arcs_path
-dag_plot_svg_path <- paths$dag_plot_svg_path
-dag_markov_blanket_svg_path <- paths$dag_markov_blanket_svg_path
-dag_markov_blanket_selected_vars_path <- paths$dag_markov_blanket_selected_vars_path
-dag_markov_blanket_excluded_vars_path <- paths$dag_markov_blanket_excluded_vars_path
-dag_config_comparison_path <- paths$dag_config_comparison_path
+dag_bic_dir <- paths$dag_bic_dir
+dag_model_path <- paths$dag_bic_model_path
+dag_arcs_path <- paths$dag_bic_arcs_path
+dag_plot_svg_path <- paths$dag_bic_plot_svg_path
+dag_markov_blanket_svg_path <- paths$dag_bic_markov_blanket_svg_path
+dag_markov_blanket_selected_vars_path <- paths$dag_bic_markov_blanket_selected_vars_path
+dag_markov_blanket_excluded_vars_path <- paths$dag_bic_markov_blanket_excluded_vars_path
+dag_config_comparison_path <- paths$dag_bic_config_comparison_path
 
 required_packages <- c("bnlearn")
 missing_packages <- required_packages[!vapply(required_packages, requireNamespace, logical(1), quietly = TRUE)]
@@ -27,7 +27,7 @@ if (!file.exists(training_set_path)) {
   stop("Training set non trovato in: ", training_set_path)
 }
 
-dir.create(dag_aic_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(dag_bic_dir, recursive = TRUE, showWarnings = FALSE)
 
 dag_data <- read.csv(training_set_path, stringsAsFactors = FALSE)
 dag_data[] <- lapply(dag_data, factor)
@@ -51,7 +51,7 @@ for (i in seq_len(nrow(config_grid))) {
 
   current_model <- bnlearn::hc(
     dag_data,
-    score = "aic",
+    score = "bic",
     restart = current_restart,
     perturb = current_perturb
   )
@@ -60,10 +60,10 @@ for (i in seq_len(nrow(config_grid))) {
 
   current_arcs <- bnlearn::arcs(current_model)
   current_markov_blanket <- sort(bnlearn::mb(current_model, "Diabetes_binary"))
-  current_score <- bnlearn::score(current_model, data = dag_data, type = "aic")
+  current_score <- bnlearn::score(current_model, data = dag_data, type = "bic")
 
   comparison_results[[i]] <- data.frame(
-    score = "aic",
+    score = "bic",
     restart = current_restart,
     perturb = current_perturb,
     seed = current_seed,
@@ -408,7 +408,7 @@ save_dag_plot(
   dag_plot_svg_path,
   nodes_to_plot = all_nodes,
   arcs_to_plot = dag_arcs,
-  plot_title = "DAG appreso con Hill Climbing e score AIC"
+  plot_title = "DAG appreso con Hill Climbing e score BIC"
 )
 
 save_dag_plot(
@@ -418,13 +418,13 @@ save_dag_plot(
   plot_title = "Markov blanket di Diabetes_binary"
 )
 
-cat("Confronto configurazioni AIC salvato in:", dag_config_comparison_path, "\n")
+cat("Confronto configurazioni BIC salvato in:", dag_config_comparison_path, "\n")
 cat("DAG migliore salvato in:", dag_model_path, "\n")
 cat("Archi del DAG migliore salvati in:", dag_arcs_path, "\n")
 cat("Plot DAG vettoriale salvato in:", dag_plot_svg_path, "\n")
 cat("Plot Markov blanket vettoriale salvato in:", dag_markov_blanket_svg_path, "\n")
 cat("Variabili selezionate dalla Markov blanket salvate in:", dag_markov_blanket_selected_vars_path, "\n")
 cat("Variabili escluse dalla Markov blanket salvate in:", dag_markov_blanket_excluded_vars_path, "\n")
-cat("Migliore configurazione AIC: restart =", best_config$restart, ", perturb =", best_config$perturb, ", seed =", best_config$seed, "\n")
-cat("Score AIC del DAG migliore:", dag_score, "\n")
+cat("Migliore configurazione BIC: restart =", best_config$restart, ", perturb =", best_config$perturb, ", seed =", best_config$seed, "\n")
+cat("Score BIC del DAG migliore:", dag_score, "\n")
 cat("Numero di archi appresi:", nrow(dag_arcs), "\n")
