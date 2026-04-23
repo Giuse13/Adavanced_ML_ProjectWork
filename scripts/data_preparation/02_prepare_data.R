@@ -47,6 +47,8 @@ prepared_data <- prepared_data[, !(names(prepared_data) %in% c("BMI", "MentHlth"
 write.csv(prepared_data, processed_data_path, row.names = FALSE)
 cat("Dataset processato salvato in:", processed_data_path, "\n")
 
+
+#split dataset in training, validation e test set
 set.seed(123)
 
 n_obs <- nrow(prepared_data)
