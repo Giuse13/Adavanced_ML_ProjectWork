@@ -1,0 +1,2 @@
+"selection","ntree","k","power","base","ndpost","nskip","rmse","mae","accuracy","sensitivity","specificity","auc"
+"aic_selection",50,1,2,0.95,400,100,0.409564281406701,0.33616768530059,0.748620738435422,0.794635254044848,0.702904681331077,0.828484326428582
