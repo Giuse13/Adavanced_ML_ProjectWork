@@ -14,7 +14,8 @@ Ad oggi il progetto include:
 - estrazione della Markov blanket di `Diabetes_binary`
 - confronto della selezione variabili tra `AIC` e `BIC` in formato Excel
 - training e validazione di modelli BART per `no_selection`, `aic_selection` e `bic_selection`
-- valutazione dei modelli BART finali tramite accuracy sui rispettivi test set
+- training diretto di modelli Naive Bayes per `no_selection`, `aic_selection` e `bic_selection`
+- valutazione dei modelli BART e Naive Bayes finali tramite accuracy sui rispettivi test set
 
 Per la documentazione dettagliata:
 
@@ -60,8 +61,12 @@ install.packages("readr", lib = .libPaths()[1])
 - `scripts/modeling/bart/_common.R`: funzioni comuni per validazione e training finale dei modelli BART.
 - `scripts/modeling/bart/*/validation.R`: validazione della griglia BART per `no_selection`, `aic_selection` e `bic_selection`.
 - `scripts/modeling/bart/*/training.R`: training finale BART usando i migliori parametri salvati dalla validazione.
+- `scripts/modeling/naive_bayes/_common.R`: funzioni comuni per training finale dei modelli Naive Bayes.
+- `scripts/modeling/naive_bayes/*/training.R`: training diretto Naive Bayes per `no_selection`, `aic_selection` e `bic_selection`.
 - `scripts/evaluation/bart/_common.R`: funzioni comuni per valutare i model bundle BART sui test set.
 - `scripts/evaluation/bart/*/performance.R`: calcolo dell'accuracy di test per i modelli BART finali.
+- `scripts/evaluation/naive_bayes/_common.R`: funzioni comuni per valutare i model bundle Naive Bayes sui test set.
+- `scripts/evaluation/naive_bayes/*/performance.R`: calcolo dell'accuracy di test per i modelli Naive Bayes finali.
 
 ## Struttura del progetto
 
@@ -75,13 +80,15 @@ install.packages("readr", lib = .libPaths()[1])
 - `scripts/structure_learning/`: apprendimento dei DAG, Markov blanket e confronto AIC/BIC.
 - `scripts/modeling/`: training e confronto modelli.
 - `scripts/evaluation/`: metriche, grafici e validazione.
-- `scripts/utils/`: funzioni riutilizzabili.
+- `scripts/utils/`: placeholder per eventuali funzioni riutilizzabili.
 - `reports/analisi_esplorativa/`: output dell'analisi esplorativa, incluse figure e file Excel.
 - `reports/dag/aic/`: output del DAG appreso con score `AIC`.
 - `reports/dag/bic/`: output del DAG appreso con score `BIC`.
 - `reports/dag/variable_selection_aic_vs_bic.xlsx`: confronto in Excel della selezione variabili tra `AIC` e `BIC`.
 - `reports/modeling/bart/`: risultati di validazione e migliori parametri dei modelli BART.
 - `reports/evaluation/bart_evaluation.csv`: confronto finale delle accuracy dei modelli BART sui test set.
+- `reports/evaluation/naive_bayes_evaluation.csv`: confronto finale delle accuracy dei modelli Naive Bayes sui test set.
 - `models/bart/`: modelli BART finali generati localmente. I file `.rds` sono esclusi da Git.
+- `models/naive_bayes/`: modelli Naive Bayes finali generati localmente. I file `.rds` sono esclusi da Git.
 - `reports/results/`: tabelle, metriche e output finali.
 - `ambiente_progettodallavalle/`: libreria locale R esclusa da Git.

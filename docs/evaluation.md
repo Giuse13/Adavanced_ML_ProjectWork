@@ -2,7 +2,7 @@
 
 ## Obiettivo
 
-Questa fase valuta le performance finali dei modelli BART addestrati nella fase di modeling.
+Questa fase valuta le performance finali dei modelli BART e Naive Bayes addestrati nella fase di modeling.
 
 La metrica attualmente usata e':
 
@@ -14,17 +14,27 @@ La logica comune della valutazione BART e' in:
 
 - `scripts/evaluation/bart/_common.R`
 
-Gli script specifici per scenario sono:
+Gli script BART specifici per scenario sono:
 
 - `scripts/evaluation/bart/no_selection/performance.R`
 - `scripts/evaluation/bart/aic_selection/performance.R`
 - `scripts/evaluation/bart/bic_selection/performance.R`
 
-Il modulo di evaluation e' indipendente dal modulo di modeling: non importa `scripts/modeling/bart/_common.R`, ma legge direttamente i model bundle `.rds` prodotti dal training finale.
+La logica comune della valutazione Naive Bayes e' in:
+
+- `scripts/evaluation/naive_bayes/_common.R`
+
+Gli script Naive Bayes specifici per scenario sono:
+
+- `scripts/evaluation/naive_bayes/no_selection/performance.R`
+- `scripts/evaluation/naive_bayes/aic_selection/performance.R`
+- `scripts/evaluation/naive_bayes/bic_selection/performance.R`
+
+I moduli di evaluation sono indipendenti dai moduli di modeling: leggono direttamente i model bundle `.rds` prodotti dal training finale.
 
 ## Workflow
 
-Ogni script `performance.R`:
+Ogni script BART `performance.R`:
 
 - legge il modello BART finale corretto da `models/bart/`
 - legge il test set corretto
@@ -32,9 +42,18 @@ Ogni script `performance.R`:
 - riallinea le colonne del test set alle `design_columns` salvate nel model bundle
 - calcola le predizioni con `predict`
 - calcola l'accuracy con soglia `0.5`
-- aggiorna il file unico `reports/evaluation/bart_evaluation.csv`
+- aggiorna il file unico definito in `project/config.R`: `reports/evaluation/bart_evaluation.csv`
 
-## Script disponibili
+Ogni script Naive Bayes `performance.R`:
+
+- legge il modello Naive Bayes finale corretto da `models/naive_bayes/`
+- legge il test set corretto
+- riallinea i factor ai livelli salvati nel model bundle
+- calcola le predizioni con `predict`
+- calcola l'accuracy
+- aggiorna il file unico definito in `project/config.R`: `reports/evaluation/naive_bayes_evaluation.csv`
+
+## Script disponibili BART
 
 Scenario senza selezione:
 
@@ -54,13 +73,39 @@ Scenario BIC:
 source("scripts/evaluation/bart/bic_selection/performance.R")
 ```
 
+## Script disponibili Naive Bayes
+
+Scenario senza selezione:
+
+```r
+source("scripts/evaluation/naive_bayes/no_selection/performance.R")
+```
+
+Scenario AIC:
+
+```r
+source("scripts/evaluation/naive_bayes/aic_selection/performance.R")
+```
+
+Scenario BIC:
+
+```r
+source("scripts/evaluation/naive_bayes/bic_selection/performance.R")
+```
+
 ## Input
 
-Modelli:
+Modelli BART:
 
 - `models/bart/no_selection/bart_model_no_selection.rds`
 - `models/bart/aic/bart_model_aic.rds`
 - `models/bart/bic/bart_model_bic.rds`
+
+Modelli Naive Bayes:
+
+- `models/naive_bayes/no_selection/naive_bayes_model_no_selection.rds`
+- `models/naive_bayes/aic/naive_bayes_model_aic.rds`
+- `models/naive_bayes/bic/naive_bayes_model_bic.rds`
 
 Test set:
 
@@ -70,11 +115,12 @@ Test set:
 
 ## Output
 
-Il file finale di confronto e':
+I file finali di confronto sono:
 
 - `reports/evaluation/bart_evaluation.csv`
+- `reports/evaluation/naive_bayes_evaluation.csv`
 
-Contiene una riga per ciascun modello:
+Ogni file contiene una riga per ciascuno scenario:
 
 - `no variable selection`
 - `aic variable selection`
@@ -89,6 +135,7 @@ Le colonne attuali sono:
 
 1. Eseguire la validazione BART per lo scenario desiderato.
 2. Eseguire il training finale BART per lo stesso scenario.
-3. Eseguire il relativo script `performance.R`.
-4. Ripetere per gli altri scenari.
-5. Confrontare le accuracy in `reports/evaluation/bart_evaluation.csv`.
+3. Eseguire il training finale Naive Bayes per lo scenario desiderato.
+4. Eseguire i relativi script `performance.R`.
+5. Ripetere per gli altri scenari.
+6. Confrontare le accuracy in `reports/evaluation/bart_evaluation.csv` e `reports/evaluation/naive_bayes_evaluation.csv`.

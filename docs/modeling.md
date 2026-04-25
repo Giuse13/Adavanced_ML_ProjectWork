@@ -2,7 +2,7 @@
 
 ## Obiettivo
 
-Questa fase addestra modelli predittivi per `Diabetes_binary` usando BART e confronta tre insiemi di covariate:
+Questa fase addestra modelli predittivi per `Diabetes_binary` usando BART e Naive Bayes, confrontando tre insiemi di covariate:
 
 - nessuna selezione variabili
 - selezione tramite Markov blanket del DAG con score `AIC`
@@ -14,7 +14,7 @@ La logica comune dei modelli BART e' centralizzata in:
 
 - `scripts/modeling/bart/_common.R`
 
-Gli script specifici per scenario sono:
+Gli script BART specifici per scenario sono:
 
 - `scripts/modeling/bart/no_selection/validation.R`
 - `scripts/modeling/bart/no_selection/training.R`
@@ -22,6 +22,16 @@ Gli script specifici per scenario sono:
 - `scripts/modeling/bart/aic_selection/training.R`
 - `scripts/modeling/bart/bic_selection/validation.R`
 - `scripts/modeling/bart/bic_selection/training.R`
+
+La logica comune dei modelli Naive Bayes e' centralizzata in:
+
+- `scripts/modeling/naive_bayes/_common.R`
+
+Gli script Naive Bayes specifici per scenario sono:
+
+- `scripts/modeling/naive_bayes/no_selection/training.R`
+- `scripts/modeling/naive_bayes/aic_selection/training.R`
+- `scripts/modeling/naive_bayes/bic_selection/training.R`
 
 ## Funzioni comuni BART
 
@@ -48,6 +58,28 @@ La griglia attuale e':
 
 Il totale e' di 12 combinazioni.
 
+Significato degli iperparametri:
+
+- `ntree`: numero di alberi usati dal modello BART. Valori piu' alti aumentano la flessibilita' del modello, ma anche il costo computazionale.
+- `k`: parametro di shrinkage che controlla quanto ciascun albero puo' contribuire alla previsione finale. Valori piu' alti rendono il contributo dei singoli alberi piu' conservativo.
+- `power`: parametro della prior sulla profondita' degli alberi. Influenza la probabilita' che un nodo venga ulteriormente splittato al crescere della profondita'.
+- `base`: parametro della prior sulla struttura degli alberi. Insieme a `power`, controlla quanto gli alberi tendono a rimanere piccoli o profondi.
+- `ndpost`: numero di campioni posteriori mantenuti dopo il burn-in. Aumentarlo puo' rendere piu' stabile la stima, ma allunga il tempo di esecuzione.
+- `nskip`: numero di iterazioni iniziali scartate come burn-in prima di salvare i campioni posteriori.
+
+## Funzioni comuni Naive Bayes
+
+Il file `scripts/modeling/naive_bayes/_common.R` contiene:
+
+- controllo della disponibilita' di `bnlearn`
+- caricamento dei dataset
+- conversione di tutte le variabili in `factor`
+- costruzione della struttura Naive Bayes con `bnlearn::naive.bayes`
+- stima dei parametri con `bnlearn::bn.fit(..., method = "bayes")`
+- salvataggio del model bundle finale
+
+I modelli Naive Bayes non hanno una griglia di iperparametri in questo progetto: vengono quindi addestrati direttamente sui rispettivi `full_training_set`.
+
 ## Workflow di validazione
 
 Ogni script `validation.R`:
@@ -67,7 +99,7 @@ source("scripts/modeling/bart/aic_selection/validation.R")
 source("scripts/modeling/bart/bic_selection/validation.R")
 ```
 
-## Workflow di training finale
+## Workflow di training finale BART
 
 Ogni script `training.R`:
 
@@ -85,6 +117,23 @@ source("scripts/modeling/bart/bic_selection/training.R")
 ```
 
 Gli script di training sono indipendenti dagli script di validazione: richiedono solo che il relativo file `best_params_*.csv` esista gia'.
+
+## Workflow di training finale Naive Bayes
+
+Ogni script `training.R`:
+
+- legge il rispettivo `full_training_set`
+- converte target e covariate in `factor`
+- addestra il modello Naive Bayes discreto
+- salva il modello `.rds` nella cartella `models/naive_bayes/`
+
+Comandi:
+
+```r
+source("scripts/modeling/naive_bayes/no_selection/training.R")
+source("scripts/modeling/naive_bayes/aic_selection/training.R")
+source("scripts/modeling/naive_bayes/bic_selection/training.R")
+```
 
 ## Dataset usati
 
@@ -122,6 +171,9 @@ Training finale:
 - `models/bart/no_selection/bart_model_no_selection.rds`
 - `models/bart/aic/bart_model_aic.rds`
 - `models/bart/bic/bart_model_bic.rds`
+- `models/naive_bayes/no_selection/naive_bayes_model_no_selection.rds`
+- `models/naive_bayes/aic/naive_bayes_model_aic.rds`
+- `models/naive_bayes/bic/naive_bayes_model_bic.rds`
 
 I file `.rds` dei modelli sono artefatti generati e possono essere molto pesanti. Per questo sono esclusi da Git tramite `.gitignore`.
 
@@ -130,5 +182,6 @@ I file `.rds` dei modelli sono artefatti generati e possono essere molto pesanti
 1. Preparare i dataset con `scripts/data_preparation/02_prepare_data.R`.
 2. Generare le selezioni AIC/BIC con gli script in `scripts/structure_learning/`.
 3. Eseguire la validazione BART per gli scenari desiderati.
-4. Eseguire il training finale per gli scenari validati.
-5. Usare i file in `reports/modeling/bart/` per confrontare le prestazioni.
+4. Eseguire il training finale BART per gli scenari validati.
+5. Eseguire il training finale Naive Bayes per gli scenari desiderati.
+6. Usare i file in `reports/modeling/bart/` per confrontare le prestazioni di validazione BART.
