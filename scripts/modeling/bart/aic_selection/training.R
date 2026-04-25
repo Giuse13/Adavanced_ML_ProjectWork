@@ -11,4 +11,15 @@ config <- list(
   model_path = paths$bart_aic_selection_model_path
 )
 
+cat(
+  "Dataset training finale AIC:",
+  normalizePath(config$full_training_path, winslash = "/", mustWork = FALSE),
+  "\n"
+)
+cat(
+  "Best params AIC:",
+  normalizePath(config$best_params_path, winslash = "/", mustWork = FALSE),
+  "\n"
+)
+
 train_final_bart_model(config)

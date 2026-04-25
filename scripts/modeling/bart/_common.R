@@ -3,13 +3,12 @@ library(BART)
 target_variable <- "Diabetes_binary"
 
 default_bart_grid <- expand.grid(
-  ntree = c(50), #100, 200),
-  k = c(1), # 2, 3), 
-  power = 2,
-  base = 0.95,
+  ntree = c(30, 50, 100),
+  k = c(1, 2),
+  power = c(2, 3),
+  base = c(0.95),
   ndpost = 400,
-  nskip = 100,
-  stringsAsFactors = FALSE
+  nskip = 100
 )
 
 ensure_dir <- function(path) {
@@ -172,10 +171,29 @@ run_bart_validation <- function(config, grid = default_bart_grid, seed = 123) {
 
 get_best_bart_params <- function(best_params_path) {
   if (!file.exists(best_params_path)) {
-    stop("Migliori parametri non trovati in: ", best_params_path)
+    stop(
+      "Migliori parametri non trovati in: ",
+      best_params_path,
+      ". Esegui prima la validazione o fornisci un CSV di best params valido."
+    )
   }
 
-  read.csv(best_params_path, stringsAsFactors = FALSE)[1, ]
+  best_params <- read.csv(best_params_path, stringsAsFactors = FALSE)
+  required_columns <- c("ntree", "k", "power", "base", "ndpost", "nskip")
+  missing_columns <- setdiff(required_columns, names(best_params))
+
+  if (nrow(best_params) < 1) {
+    stop("Il file dei migliori parametri e' vuoto: ", best_params_path)
+  }
+
+  if (length(missing_columns) > 0) {
+    stop(
+      "Il file dei migliori parametri non contiene le colonne richieste: ",
+      paste(missing_columns, collapse = ", ")
+    )
+  }
+
+  best_params[1, required_columns, drop = FALSE]
 }
 
 train_final_bart_model <- function(config, seed = 123) {
@@ -185,6 +203,14 @@ train_final_bart_model <- function(config, seed = 123) {
   full_training_xy <- prepare_bart_xy(full_training_data)
   design <- build_design_matrices(full_training_xy$x)
   best_params <- get_best_bart_params(config$best_params_path)
+
+  cat(
+    "Addestramento BART finale",
+    config$selection_name,
+    "con parametri:",
+    paste(names(best_params), as.character(best_params[1, ]), sep = "=", collapse = ", "),
+    "\n"
+  )
 
   model <- fit_gbart(
     x_train = design$train,

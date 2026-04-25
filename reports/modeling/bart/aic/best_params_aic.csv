@@ -1,2 +1,2 @@
 "selection","ntree","k","power","base","ndpost","nskip","accuracy"
-"aic_selection",50,1,2,0.95,400,100,0.748620738435422
+"aic_selection",50,2,3,0.95,400,100,0.750389022492573
