@@ -7,12 +7,47 @@ training_set_path <- paths$training_set_path
 validation_set_path <- paths$validation_set_path
 test_set_path <- paths$test_set_path
 full_training_set_path <- paths$full_training_set_path
+aic_training_set_path <- paths$aic_training_set_path
+aic_validation_set_path <- paths$aic_validation_set_path
+aic_test_set_path <- paths$aic_test_set_path
+aic_full_training_set_path <- paths$aic_full_training_set_path
+bic_training_set_path <- paths$bic_training_set_path
+bic_validation_set_path <- paths$bic_validation_set_path
+bic_test_set_path <- paths$bic_test_set_path
+bic_full_training_set_path <- paths$bic_full_training_set_path
+aic_excluded_variables_path <- paths$dag_markov_blanket_excluded_vars_path
+bic_excluded_variables_path <- paths$dag_bic_markov_blanket_excluded_vars_path
+split_sets_dir <- dirname(training_set_path)
+aic_split_sets_dir <- dirname(aic_training_set_path)
+bic_split_sets_dir <- dirname(bic_training_set_path)
 
 if (!file.exists(raw_data_path)) {
   stop("Dataset non trovato in: ", raw_data_path)
 }
 
+if (!file.exists(aic_excluded_variables_path)) {
+  stop("File variabili escluse AIC non trovato in: ", aic_excluded_variables_path)
+}
+
+if (!file.exists(bic_excluded_variables_path)) {
+  stop("File variabili escluse BIC non trovato in: ", bic_excluded_variables_path)
+}
+
+if (!dir.exists(split_sets_dir)) {
+  dir.create(split_sets_dir, recursive = TRUE)
+}
+
+if (!dir.exists(aic_split_sets_dir)) {
+  dir.create(aic_split_sets_dir, recursive = TRUE)
+}
+
+if (!dir.exists(bic_split_sets_dir)) {
+  dir.create(bic_split_sets_dir, recursive = TRUE)
+}
+
 data <- read.csv(raw_data_path)
+aic_excluded_variables <- read.csv(aic_excluded_variables_path, stringsAsFactors = FALSE)$variable
+bic_excluded_variables <- read.csv(bic_excluded_variables_path, stringsAsFactors = FALSE)$variable
 
 
 prepared_data <- data
@@ -72,7 +107,34 @@ write.csv(test_set, test_set_path, row.names = FALSE)
 full_training_set <- rbind(training_set, validation_set)
 write.csv(full_training_set, full_training_set_path, row.names = FALSE)
 
+aic_training_set <- training_set[, !(names(training_set) %in% aic_excluded_variables)]
+aic_validation_set <- validation_set[, !(names(validation_set) %in% aic_excluded_variables)]
+aic_test_set <- test_set[, !(names(test_set) %in% aic_excluded_variables)]
+aic_full_training_set <- full_training_set[, !(names(full_training_set) %in% aic_excluded_variables)]
+
+bic_training_set <- training_set[, !(names(training_set) %in% bic_excluded_variables)]
+bic_validation_set <- validation_set[, !(names(validation_set) %in% bic_excluded_variables)]
+bic_test_set <- test_set[, !(names(test_set) %in% bic_excluded_variables)]
+bic_full_training_set <- full_training_set[, !(names(full_training_set) %in% bic_excluded_variables)]
+
+write.csv(aic_training_set, aic_training_set_path, row.names = FALSE)
+write.csv(aic_validation_set, aic_validation_set_path, row.names = FALSE)
+write.csv(aic_test_set, aic_test_set_path, row.names = FALSE)
+write.csv(aic_full_training_set, aic_full_training_set_path, row.names = FALSE)
+write.csv(bic_training_set, bic_training_set_path, row.names = FALSE)
+write.csv(bic_validation_set, bic_validation_set_path, row.names = FALSE)
+write.csv(bic_test_set, bic_test_set_path, row.names = FALSE)
+write.csv(bic_full_training_set, bic_full_training_set_path, row.names = FALSE)
+
 cat("Training set salvato in:", training_set_path, "\n")
 cat("Validation set salvato in:", validation_set_path, "\n")
 cat("Test set salvato in:", test_set_path, "\n")
 cat("Full training set salvato in:", full_training_set_path, "\n")
+cat("Training set AIC salvato in:", aic_training_set_path, "\n")
+cat("Validation set AIC salvato in:", aic_validation_set_path, "\n")
+cat("Test set AIC salvato in:", aic_test_set_path, "\n")
+cat("Full training set AIC salvato in:", aic_full_training_set_path, "\n")
+cat("Training set BIC salvato in:", bic_training_set_path, "\n")
+cat("Validation set BIC salvato in:", bic_validation_set_path, "\n")
+cat("Test set BIC salvato in:", bic_test_set_path, "\n")
+cat("Full training set BIC salvato in:", bic_full_training_set_path, "\n")
