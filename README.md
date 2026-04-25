@@ -13,11 +13,13 @@ Ad oggi il progetto include:
 - apprendimento di DAG con hill climbing e score `BIC`
 - estrazione della Markov blanket di `Diabetes_binary`
 - confronto della selezione variabili tra `AIC` e `BIC` in formato Excel
+- training e validazione di modelli BART per `no_selection`, `aic_selection` e `bic_selection`
 
 Per la documentazione dettagliata:
 
 - [docs/data_preparation.md](docs/data_preparation.md)
 - [docs/structure_learning.md](docs/structure_learning.md)
+- [docs/modeling.md](docs/modeling.md)
 
 ## Ambiente R
 
@@ -53,6 +55,9 @@ install.packages("readr", lib = .libPaths()[1])
 - `scripts/structure_learning/01_learn_dag_hc_aic.R`: confronto di configurazioni `AIC`, selezione del DAG migliore e generazione degli output in `reports/dag/aic/`.
 - `scripts/structure_learning/02_learn_dag_hc_bic.R`: confronto di configurazioni `BIC`, selezione del DAG migliore e generazione degli output in `reports/dag/bic/`.
 - `scripts/structure_learning/03_export_variable_selection_comparison.R`: creazione del file Excel di confronto tra selezione variabili `AIC` e `BIC`.
+- `scripts/modeling/bart/_common.R`: funzioni comuni per validazione e training finale dei modelli BART.
+- `scripts/modeling/bart/*/validation.R`: validazione della griglia BART per `no_selection`, `aic_selection` e `bic_selection`.
+- `scripts/modeling/bart/*/training.R`: training finale BART usando i migliori parametri salvati dalla validazione.
 
 ## Struttura del progetto
 
@@ -71,5 +76,7 @@ install.packages("readr", lib = .libPaths()[1])
 - `reports/dag/aic/`: output del DAG appreso con score `AIC`.
 - `reports/dag/bic/`: output del DAG appreso con score `BIC`.
 - `reports/dag/variable_selection_aic_vs_bic.xlsx`: confronto in Excel della selezione variabili tra `AIC` e `BIC`.
+- `reports/modeling/bart/`: risultati di validazione e migliori parametri dei modelli BART.
+- `models/bart/`: modelli BART finali generati localmente. I file `.rds` sono esclusi da Git.
 - `reports/results/`: tabelle, metriche e output finali.
 - `ambiente_progettodallavalle/`: libreria locale R esclusa da Git.
