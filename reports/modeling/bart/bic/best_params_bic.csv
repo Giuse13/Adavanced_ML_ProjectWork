@@ -1,0 +1,2 @@
+"selection","ntree","k","power","base","ndpost","nskip","accuracy"
+"bic_selection",100,2,2,0.95,400,100,0.748762201159994
