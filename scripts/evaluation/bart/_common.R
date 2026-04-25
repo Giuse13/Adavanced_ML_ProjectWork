@@ -1,6 +1,8 @@
 library(BART)
 
 target_variable <- "Diabetes_binary"
+
+# File unico aggiornato dai tre performance.R.
 bart_evaluation_results_path <- "reports/evaluation/bart_evaluation.csv"
 
 ensure_dir <- function(path) {
@@ -62,6 +64,7 @@ build_test_design_matrix <- function(test_x, design_columns) {
   missing_columns <- setdiff(design_columns, colnames(test_matrix))
   extra_columns <- setdiff(colnames(test_matrix), design_columns)
 
+  # Alcuni livelli categorici presenti in training potrebbero mancare nel test set.
   if (length(missing_columns) > 0) {
     zero_columns <- matrix(
       0,
@@ -72,16 +75,19 @@ build_test_design_matrix <- function(test_x, design_columns) {
     test_matrix <- cbind(test_matrix, zero_columns)
   }
 
+  # Eventuali livelli nuovi nel test non erano noti al modello e vengono rimossi.
   if (length(extra_columns) > 0) {
     test_matrix <- test_matrix[, setdiff(colnames(test_matrix), extra_columns), drop = FALSE]
   }
 
+  # L'ordine delle colonne deve coincidere con quello usato durante il training.
   test_matrix[, design_columns, drop = FALSE]
 }
 
 upsert_bart_evaluation_result <- function(result, path = bart_evaluation_results_path) {
   ensure_dir(dirname(path))
 
+  # Aggiorna la riga dello scenario corrente senza duplicarla.
   if (file.exists(path)) {
     results <- read.csv(path, stringsAsFactors = FALSE)
     results <- results[results$selection != result$selection, , drop = FALSE]
@@ -104,6 +110,7 @@ upsert_bart_evaluation_result <- function(result, path = bart_evaluation_results
 }
 
 get_bart_evaluation_predictions <- function(prediction) {
+  # Alcune versioni/metodi possono restituire direttamente il vettore numerico.
   if (is.numeric(prediction)) {
     return(prediction)
   }
@@ -116,6 +123,7 @@ run_bart_test_evaluation <- function(config) {
     stop("Modello BART non trovato in: ", config$model_path)
   }
 
+  # L'evaluation parte dal model bundle salvato dal training finale.
   test_data <- load_dataset(config$test_path)
   test_xy <- prepare_bart_xy(test_data)
   model_bundle <- readRDS(config$model_path)
@@ -130,6 +138,8 @@ run_bart_test_evaluation <- function(config) {
   )
 
   prediction <- predict(model_bundle$model, test_matrix)
+
+  # Accuracy a soglia 0.5, coerente con la metrica usata in validazione.
   metrics <- accuracy_metric(
     actual = test_xy$y,
     predicted_score = get_bart_evaluation_predictions(prediction)

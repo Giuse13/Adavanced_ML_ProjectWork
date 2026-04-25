@@ -2,6 +2,7 @@ library(BART)
 
 target_variable <- "Diabetes_binary"
 
+# Griglia condivisa dagli script validation.R dei tre scenari BART.
 default_bart_grid <- expand.grid(
   ntree = c(30, 50, 100),
   k = c(1, 2),
@@ -38,6 +39,7 @@ prepare_bart_xy <- function(data, target = target_variable) {
 
 build_design_matrices <- function(train_x, test_x = NULL) {
   if (is.null(test_x)) {
+    # model.matrix trasforma factor e categoriche nelle stesse dummy usate da BART.
     train_matrix <- model.matrix(~ . - 1, data = train_x)
 
     return(list(
@@ -47,6 +49,7 @@ build_design_matrices <- function(train_x, test_x = NULL) {
     ))
   }
 
+  # Costruire train e test insieme garantisce la stessa codifica delle variabili categoriche.
   train_rows <- nrow(train_x)
   all_x <- rbind(train_x, test_x)
   all_matrix <- model.matrix(~ . - 1, data = all_x)
@@ -70,6 +73,7 @@ accuracy_metric <- function(actual, predicted_score, threshold = 0.5) {
 fit_gbart <- function(x_train, y_train, x_test = NULL, params, seed) {
   set.seed(seed)
 
+  # type = "pbart" usa BART per classificazione binaria con output probabilistico.
   args <- list(
     x.train = x_train,
     y.train = y_train,
@@ -115,6 +119,7 @@ get_bart_predictions <- function(model, validation = TRUE) {
 run_bart_validation <- function(config, grid = default_bart_grid, seed = 123) {
   ensure_dir(config$reports_dir)
 
+  # La validazione usa training e validation separati per scegliere gli iperparametri.
   training_data <- load_dataset(config$training_path)
   validation_data <- load_dataset(config$validation_path)
 
@@ -154,6 +159,8 @@ run_bart_validation <- function(config, grid = default_bart_grid, seed = 123) {
 
   results <- results[order(-results$accuracy), ]
   write.csv(results, config$validation_results_path, row.names = FALSE)
+
+  # Il training finale legge solo questa riga: deve contenere i parametri migliori.
   write.csv(results[1, ], config$best_params_path, row.names = FALSE)
 
   cat(
@@ -199,6 +206,7 @@ get_best_bart_params <- function(best_params_path) {
 train_final_bart_model <- function(config, seed = 123) {
   ensure_dir(config$model_dir)
 
+  # Il modello finale viene addestrato su training + validation usando i best params.
   full_training_data <- load_dataset(config$full_training_path)
   full_training_xy <- prepare_bart_xy(full_training_data)
   design <- build_design_matrices(full_training_xy$x)
@@ -225,6 +233,7 @@ train_final_bart_model <- function(config, seed = 123) {
     selection = config$selection_name,
     target = target_variable,
     predictor_columns = names(full_training_xy$x),
+    # Necessario in evaluation per riallineare le colonne generate da model.matrix.
     design_columns = design$columns,
     best_params = best_params,
     trained_at = Sys.time()
