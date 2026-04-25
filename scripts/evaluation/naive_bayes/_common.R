@@ -13,9 +13,6 @@ if (length(missing_packages) > 0) {
 
 target_variable <- "Diabetes_binary"
 
-# File unico aggiornato dai tre performance.R.
-naive_bayes_evaluation_results_path <- "reports/evaluation/naive_bayes_evaluation.csv"
-
 ensure_dir <- function(path) {
   if (!dir.exists(path)) {
     dir.create(path, recursive = TRUE)
@@ -62,7 +59,7 @@ accuracy_metric <- function(actual, predicted_class) {
   )
 }
 
-upsert_naive_bayes_evaluation_result <- function(result, path = naive_bayes_evaluation_results_path) {
+upsert_naive_bayes_evaluation_result <- function(result, path) {
   ensure_dir(dirname(path))
 
   # Aggiorna la riga dello scenario corrente senza duplicarla.
@@ -121,13 +118,13 @@ run_naive_bayes_test_evaluation <- function(config) {
     stringsAsFactors = FALSE
   )
 
-  results <- upsert_naive_bayes_evaluation_result(result)
+  results <- upsert_naive_bayes_evaluation_result(result, config$evaluation_results_path)
 
   cat("Evaluation Naive Bayes completata per:", config$selection_label, "\n")
   cat("Accuracy test:", round(metrics$accuracy, 4), "\n")
   cat(
     "Risultati salvati in:",
-    normalizePath(naive_bayes_evaluation_results_path, winslash = "/", mustWork = FALSE),
+    normalizePath(config$evaluation_results_path, winslash = "/", mustWork = FALSE),
     "\n"
   )
 

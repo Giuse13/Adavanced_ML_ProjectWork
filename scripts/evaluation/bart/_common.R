@@ -2,9 +2,6 @@ library(BART)
 
 target_variable <- "Diabetes_binary"
 
-# File unico aggiornato dai tre performance.R.
-bart_evaluation_results_path <- "reports/evaluation/bart_evaluation.csv"
-
 ensure_dir <- function(path) {
   if (!dir.exists(path)) {
     dir.create(path, recursive = TRUE)
@@ -84,7 +81,7 @@ build_test_design_matrix <- function(test_x, design_columns) {
   test_matrix[, design_columns, drop = FALSE]
 }
 
-upsert_bart_evaluation_result <- function(result, path = bart_evaluation_results_path) {
+upsert_bart_evaluation_result <- function(result, path) {
   ensure_dir(dirname(path))
 
   # Aggiorna la riga dello scenario corrente senza duplicarla.
@@ -151,13 +148,13 @@ run_bart_test_evaluation <- function(config) {
     stringsAsFactors = FALSE
   )
 
-  results <- upsert_bart_evaluation_result(result)
+  results <- upsert_bart_evaluation_result(result, config$evaluation_results_path)
 
   cat("Evaluation BART completata per:", config$selection_label, "\n")
   cat("Accuracy test:", round(metrics$accuracy, 4), "\n")
   cat(
     "Risultati salvati in:",
-    normalizePath(bart_evaluation_results_path, winslash = "/", mustWork = FALSE),
+    normalizePath(config$evaluation_results_path, winslash = "/", mustWork = FALSE),
     "\n"
   )
 
