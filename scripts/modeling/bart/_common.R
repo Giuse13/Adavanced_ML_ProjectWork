@@ -59,35 +59,12 @@ build_design_matrices <- function(train_x, test_x = NULL) {
   )
 }
 
-auc_score <- function(actual, predicted) {
-  positives <- actual == 1
-  n_positive <- sum(positives)
-  n_negative <- sum(!positives)
-
-  if (n_positive == 0 || n_negative == 0) {
-    return(NA_real_)
-  }
-
-  ranks <- rank(predicted, ties.method = "average")
-  (sum(ranks[positives]) - n_positive * (n_positive + 1) / 2) / (n_positive * n_negative)
-}
-
-classification_metrics <- function(actual, predicted_score, threshold = 0.5) {
+accuracy_metric <- function(actual, predicted_score, threshold = 0.5) {
   predicted_probability <- pmin(pmax(predicted_score, 0), 1)
   predicted_class <- as.integer(predicted_probability >= threshold)
 
-  tp <- sum(actual == 1 & predicted_class == 1)
-  tn <- sum(actual == 0 & predicted_class == 0)
-  fp <- sum(actual == 0 & predicted_class == 1)
-  fn <- sum(actual == 1 & predicted_class == 0)
-
   data.frame(
-    rmse = sqrt(mean((actual - predicted_score)^2)),
-    mae = mean(abs(actual - predicted_score)),
-    accuracy = mean(actual == predicted_class),
-    sensitivity = ifelse((tp + fn) == 0, NA_real_, tp / (tp + fn)),
-    specificity = ifelse((tn + fp) == 0, NA_real_, tn / (tn + fp)),
-    auc = auc_score(actual, predicted_probability)
+    accuracy = mean(actual == predicted_class)
   )
 }
 
@@ -160,7 +137,7 @@ run_bart_validation <- function(config, grid = default_bart_grid, seed = 123) {
       seed = seed + i
     )
 
-    metrics <- classification_metrics(
+    metrics <- accuracy_metric(
       actual = validation_xy$y,
       predicted_score = get_bart_predictions(model, validation = TRUE)
     )
@@ -176,7 +153,7 @@ run_bart_validation <- function(config, grid = default_bart_grid, seed = 123) {
     )
   }
 
-  results <- results[order(results$rmse, -results$auc, -results$accuracy), ]
+  results <- results[order(-results$accuracy), ]
   write.csv(results, config$validation_results_path, row.names = FALSE)
   write.csv(results[1, ], config$best_params_path, row.names = FALSE)
 
