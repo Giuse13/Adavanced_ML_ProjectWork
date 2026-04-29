@@ -1,4 +1,4 @@
-required_packages <- c("bnlearn")
+required_packages <- c("bnlearn", "Rgraphviz")
 
 missing_packages <- required_packages[
   !vapply(required_packages, requireNamespace, logical(1), quietly = TRUE)
@@ -68,8 +68,23 @@ fit_naive_bayes <- function(data, target = target_variable) {
   )
 }
 
+save_naive_bayes_structure_plot <- function(structure, plot_path) {
+  ensure_dir(dirname(plot_path))
+
+  svg(filename = plot_path, width = 18, height = 11.5, bg = "white")
+  on.exit(dev.off(), add = TRUE)
+
+  bnlearn::graphviz.plot(
+    x = structure,
+    layout = "dot",
+    shape = "ellipse",
+    main = "Naive Bayes"
+  )
+}
+
 train_final_naive_bayes_model <- function(config) {
   ensure_dir(config$model_dir)
+  ensure_dir(config$reports_dir)
 
   full_training_data <- load_dataset(config$full_training_path)
   trained_model <- fit_naive_bayes(full_training_data)
@@ -86,9 +101,19 @@ train_final_naive_bayes_model <- function(config) {
   )
 
   saveRDS(model_bundle, config$model_path)
+  save_naive_bayes_structure_plot(
+    structure = trained_model$structure,
+    plot_path = config$structure_plot_path
+  )
+
   cat(
     "Modello Naive Bayes salvato in:",
     normalizePath(config$model_path, winslash = "/", mustWork = FALSE),
+    "\n"
+  )
+  cat(
+    "Plot rete Naive Bayes salvato in:",
+    normalizePath(config$structure_plot_path, winslash = "/", mustWork = FALSE),
     "\n"
   )
 

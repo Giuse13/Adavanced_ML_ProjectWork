@@ -76,7 +76,7 @@ save_tan_structure_plot <- function(structure, plot_path) {
 
   bnlearn::graphviz.plot(
     x = structure,
-    layout = "dot",
+    layout = "dot",      # layout altenativo usato dalla prof "fdp"
     shape = "ellipse",
     main = "Tree-Augmented Naive Bayes"
   )
