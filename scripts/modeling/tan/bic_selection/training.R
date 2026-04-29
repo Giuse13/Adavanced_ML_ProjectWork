@@ -7,7 +7,9 @@ config <- list(
   selection_name = "bic_selection",
   full_training_path = paths$bic_full_training_set_path,
   model_dir = paths$tan_bic_selection_model_dir,
-  model_path = paths$tan_bic_selection_model_path
+  model_path = paths$tan_bic_selection_model_path,
+  reports_dir = paths$tan_bic_selection_reports_dir,
+  structure_plot_path = paths$tan_bic_selection_structure_plot_path
 )
 
 cat(

@@ -7,7 +7,9 @@ config <- list(
   selection_name = "no_selection",
   full_training_path = paths$full_training_set_path,
   model_dir = paths$tan_no_selection_model_dir,
-  model_path = paths$tan_no_selection_model_path
+  model_path = paths$tan_no_selection_model_path,
+  reports_dir = paths$tan_no_selection_reports_dir,
+  structure_plot_path = paths$tan_no_selection_structure_plot_path
 )
 
 cat(
