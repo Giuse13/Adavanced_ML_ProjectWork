@@ -10,9 +10,9 @@ La variabile risposta considerata nel progetto e':
 
 ## Dataset usato
 
-I DAG sono attualmente costruiti sul file:
+I DAG sono attualmente costruiti sul training set completo, senza selezione preventiva:
 
-- `data/processed/training_set.csv`
+- `data/processed/no_selection/training_set.csv`
 
 La scelta e' coerente con il fatto che la Markov blanket e la successiva selezione variabili devono essere stimate sul training set.
 

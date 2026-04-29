@@ -2,7 +2,7 @@
 
 ## Obiettivo
 
-Questa fase addestra modelli predittivi per `Diabetes_binary` usando BART e Naive Bayes, confrontando tre insiemi di covariate:
+Questa fase addestra modelli predittivi per `Diabetes_binary` usando BART, Naive Bayes e TAN, confrontando tre insiemi di covariate:
 
 - nessuna selezione variabili
 - selezione tramite Markov blanket del DAG con score `AIC`
@@ -32,6 +32,16 @@ Gli script Naive Bayes specifici per scenario sono:
 - `scripts/modeling/naive_bayes/no_selection/training.R`
 - `scripts/modeling/naive_bayes/aic_selection/training.R`
 - `scripts/modeling/naive_bayes/bic_selection/training.R`
+
+La logica comune dei modelli TAN e' centralizzata in:
+
+- `scripts/modeling/tan/_common.R`
+
+Gli script TAN specifici per scenario sono:
+
+- `scripts/modeling/tan/no_selection/training.R`
+- `scripts/modeling/tan/aic_selection/training.R`
+- `scripts/modeling/tan/bic_selection/training.R`
 
 ## Funzioni comuni BART
 
@@ -79,6 +89,22 @@ Il file `scripts/modeling/naive_bayes/_common.R` contiene:
 - salvataggio del model bundle finale
 
 I modelli Naive Bayes non hanno una griglia di iperparametri in questo progetto: vengono quindi addestrati direttamente sui rispettivi `full_training_set`.
+
+Durante il training viene anche salvato il grafo della struttura Naive Bayes in `reports/modeling/naive_bayes/`.
+
+## Funzioni comuni TAN
+
+Il file `scripts/modeling/tan/_common.R` contiene:
+
+- controllo della disponibilita' di `bnlearn` e `Rgraphviz`
+- caricamento dei dataset
+- conversione di tutte le variabili in `factor`
+- costruzione della struttura TAN con `bnlearn::tree.bayes`
+- stima dei parametri con `bnlearn::bn.fit(..., method = "bayes")`
+- salvataggio del model bundle finale
+- esportazione del grafo TAN in formato SVG
+
+Anche i modelli TAN non hanno una griglia di iperparametri in questo progetto: vengono addestrati direttamente sui rispettivi `full_training_set`.
 
 ## Workflow di validazione
 
@@ -135,6 +161,24 @@ source("scripts/modeling/naive_bayes/aic_selection/training.R")
 source("scripts/modeling/naive_bayes/bic_selection/training.R")
 ```
 
+## Workflow di training finale TAN
+
+Ogni script `training.R`:
+
+- legge il rispettivo `full_training_set`
+- converte target e covariate in `factor`
+- addestra il modello Tree-Augmented Naive Bayes
+- salva il modello `.rds` nella cartella `models/tan/`
+- salva il grafo della rete in `reports/modeling/tan/`
+
+Comandi:
+
+```r
+source("scripts/modeling/tan/no_selection/training.R")
+source("scripts/modeling/tan/aic_selection/training.R")
+source("scripts/modeling/tan/bic_selection/training.R")
+```
+
 ## Dataset usati
 
 Scenario senza selezione:
@@ -174,6 +218,18 @@ Training finale:
 - `models/naive_bayes/no_selection/naive_bayes_model_no_selection.rds`
 - `models/naive_bayes/aic/naive_bayes_model_aic.rds`
 - `models/naive_bayes/bic/naive_bayes_model_bic.rds`
+- `models/tan/no_selection/tan_model_no_selection.rds`
+- `models/tan/aic/tan_model_aic.rds`
+- `models/tan/bic/tan_model_bic.rds`
+
+Grafi struttura:
+
+- `reports/modeling/naive_bayes/no_selection/naive_bayes_network_no_selection.svg`
+- `reports/modeling/naive_bayes/aic/naive_bayes_network_aic.svg`
+- `reports/modeling/naive_bayes/bic/naive_bayes_network_bic.svg`
+- `reports/modeling/tan/no_selection/tan_network_no_selection.svg`
+- `reports/modeling/tan/aic/tan_network_aic.svg`
+- `reports/modeling/tan/bic/tan_network_bic.svg`
 
 I file `.rds` dei modelli sono artefatti generati e possono essere molto pesanti. Per questo sono esclusi da Git tramite `.gitignore`.
 
@@ -184,4 +240,5 @@ I file `.rds` dei modelli sono artefatti generati e possono essere molto pesanti
 3. Eseguire la validazione BART per gli scenari desiderati.
 4. Eseguire il training finale BART per gli scenari validati.
 5. Eseguire il training finale Naive Bayes per gli scenari desiderati.
-6. Usare i file in `reports/modeling/bart/` per confrontare le prestazioni di validazione BART.
+6. Eseguire il training finale TAN per gli scenari desiderati.
+7. Usare i file in `reports/modeling/bart/` per confrontare le prestazioni di validazione BART.

@@ -26,20 +26,49 @@ Lo script `02_prepare_data.R`:
   - `MentHlth_categoriale`
   - `PhysHlth_categoriale`
 - rimuove le versioni originali di `BMI`, `MentHlth` e `PhysHlth`
+- legge le variabili escluse dai workflow DAG `AIC` e `BIC`
+- crea anche gli split ridotti per gli scenari `aic_selection` e `bic_selection`
 
 ## Split del dataset
 
 Lo script `02_prepare_data.R` usa un seed fisso (`123`) e produce:
 
-- `training_set.csv`
-- `validation_set.csv`
-- `test_set.csv`
-- `full_training_set.csv`
+- `data/processed/no_selection/training_set.csv`
+- `data/processed/no_selection/validation_set.csv`
+- `data/processed/no_selection/test_set.csv`
+- `data/processed/no_selection/full_training_set.csv`
 
 Il file `full_training_set.csv` e' costruito come unione di:
 
 - `training_set`
 - `validation_set`
+
+La proporzione usata e':
+
+- 70% training
+- 20% validation
+- 10% test
+
+## Dataset per selezione variabili
+
+Oltre allo scenario completo, lo script genera due famiglie di dataset ridotti:
+
+- `data/processed/aic_selection/`
+- `data/processed/bic_selection/`
+
+Per ciascuna famiglia vengono salvati:
+
+- `training_set_*`
+- `validation_set_*`
+- `test_set_*`
+- `full_training_set_*`
+
+Le colonne rimosse sono lette dai file prodotti dalla fase di structure learning:
+
+- `reports/dag/aic/dag_markov_blanket_excluded_variables.csv`
+- `reports/dag/bic/dag_markov_blanket_excluded_variables.csv`
+
+Di conseguenza, lo script `02_prepare_data.R` richiede che gli output AIC/BIC della Markov blanket siano gia' presenti quando si vogliono rigenerare anche i dataset ridotti.
 
 ## Path centralizzati
 
@@ -51,10 +80,19 @@ I path dei dataset sono definiti in `project/config.R` e includono:
 - `validation_set_path`
 - `test_set_path`
 - `full_training_set_path`
+- `aic_training_set_path`
+- `aic_validation_set_path`
+- `aic_test_set_path`
+- `aic_full_training_set_path`
+- `bic_training_set_path`
+- `bic_validation_set_path`
+- `bic_test_set_path`
+- `bic_full_training_set_path`
 
 ## Ruolo nella pipeline
 
 Attualmente:
 
-- i DAG vengono appresi su `training_set.csv`
-- il `full_training_set.csv` e' disponibile per usi successivi, ad esempio training finale di modelli predittivi
+- i DAG vengono appresi sul training set completo, cioe' `data/processed/no_selection/training_set.csv`
+- i modelli finali BART, Naive Bayes e TAN vengono addestrati sui rispettivi `full_training_set`
+- gli scenari `aic_selection` e `bic_selection` usano solo le covariate selezionate dalla Markov blanket del relativo DAG
