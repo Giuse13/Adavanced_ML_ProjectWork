@@ -55,6 +55,7 @@ project_paths <- list(
   evaluation_reports_dir = "reports/evaluation",
   bart_evaluation_results_path = "reports/evaluation/bart_evaluation.csv",
   naive_bayes_evaluation_results_path = "reports/evaluation/naive_bayes_evaluation.csv",
+  tan_evaluation_results_path = "reports/evaluation/tan_evaluation.csv",
   dag_aic_dir = "reports/dag/aic",
   dag_model_path = "reports/dag/aic/dag_hc_aic_best_model.rds",
   dag_arcs_path = "reports/dag/aic/dag_hc_aic_best_arcs.csv",
