@@ -1,0 +1,2 @@
+"selection","hidden_units","dropout","learning_rate","batch_size","epochs","weight_decay","accuracy"
+"bic_selection","64-32",0.4,0.001,128,50,1e-04,0.748337812986278

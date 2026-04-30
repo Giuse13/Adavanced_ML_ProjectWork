@@ -1,0 +1,4 @@
+"selection","accuracy"
+"no variable selection",0.752899575671853
+"aic variable selection",0.750636492220651
+"bic variable selection",0.752192362093352

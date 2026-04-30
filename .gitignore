@@ -52,10 +52,18 @@ ambiente_progettodallavalle/
 .vscode/settings.json
 
 # Project outputs
-models/**/*.rds
+models/**
+!models/**/
+!models/**/.gitkeep
 reports/analisi_esplorativa/figures/*
 !reports/analisi_esplorativa/figures/.gitkeep
 !reports/analisi_esplorativa/figures/correlations/
 !reports/analisi_esplorativa/figures/distributions/
 reports/results/*
 !reports/results/.gitkeep
+
+# Local scratch/comparison scripts
+scripts/confronto_bart.R
+scripts/confronto_modelliBayes.R
+scripts/prova2.R
+scripts/prova3.R
