@@ -61,3 +61,9 @@ reports/analisi_esplorativa/figures/*
 !reports/analisi_esplorativa/figures/distributions/
 reports/results/*
 !reports/results/.gitkeep
+
+# Local scratch/comparison scripts
+scripts/confronto_bart.R
+scripts/confronto_modelliBayes.R
+scripts/prova2.R
+scripts/prova3.R
