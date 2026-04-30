@@ -53,8 +53,6 @@ ambiente_progettodallavalle/
 
 # Project outputs
 models/**
-!models/**/
-!models/**/.gitkeep
 reports/analisi_esplorativa/figures/*
 !reports/analisi_esplorativa/figures/.gitkeep
 !reports/analisi_esplorativa/figures/correlations/
