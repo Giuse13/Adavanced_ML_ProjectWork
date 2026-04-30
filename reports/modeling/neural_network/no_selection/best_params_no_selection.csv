@@ -1,0 +1,2 @@
+"selection","hidden_units","dropout","learning_rate","batch_size","epochs","weight_decay","accuracy"
+"no_selection","64",0.271,0.000109,64,50,0,0.749398783420569
