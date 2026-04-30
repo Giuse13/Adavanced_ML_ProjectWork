@@ -94,5 +94,5 @@ I path dei dataset sono definiti in `project/config.R` e includono:
 Attualmente:
 
 - i DAG vengono appresi sul training set completo, cioe' `data/processed/no_selection/training_set.csv`
-- i modelli finali BART, Naive Bayes e TAN vengono addestrati sui rispettivi `full_training_set`
+- i modelli finali BART, Neural Network, Naive Bayes e TAN vengono addestrati sui rispettivi `full_training_set`
 - gli scenari `aic_selection` e `bic_selection` usano solo le covariate selezionate dalla Markov blanket del relativo DAG

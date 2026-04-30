@@ -2,7 +2,7 @@
 
 ## Obiettivo
 
-Questa fase addestra modelli predittivi per `Diabetes_binary` usando BART, Naive Bayes e TAN, confrontando tre insiemi di covariate:
+Questa fase addestra modelli predittivi per `Diabetes_binary` usando BART, Neural Network, Naive Bayes e TAN, confrontando tre insiemi di covariate:
 
 - nessuna selezione variabili
 - selezione tramite Markov blanket del DAG con score `AIC`
@@ -42,6 +42,19 @@ Gli script TAN specifici per scenario sono:
 - `scripts/modeling/tan/no_selection/training.R`
 - `scripts/modeling/tan/aic_selection/training.R`
 - `scripts/modeling/tan/bic_selection/training.R`
+
+La logica comune delle reti neurali e' centralizzata in:
+
+- `scripts/modeling/neural_network/_common.R`
+
+Gli script Neural Network specifici per scenario sono:
+
+- `scripts/modeling/neural_network/no_selection/validation.R`
+- `scripts/modeling/neural_network/no_selection/training.R`
+- `scripts/modeling/neural_network/aic_selection/validation.R`
+- `scripts/modeling/neural_network/aic_selection/training.R`
+- `scripts/modeling/neural_network/bic_selection/validation.R`
+- `scripts/modeling/neural_network/bic_selection/training.R`
 
 ## Funzioni comuni BART
 
@@ -106,13 +119,45 @@ Il file `scripts/modeling/tan/_common.R` contiene:
 
 Anche i modelli TAN non hanno una griglia di iperparametri in questo progetto: vengono addestrati direttamente sui rispettivi `full_training_set`.
 
+## Funzioni comuni Neural Network
+
+Il file `scripts/modeling/neural_network/_common.R` contiene:
+
+- caricamento dei dataset
+- preparazione di `x` e `y`
+- costruzione delle matrici tramite `model.matrix`
+- standardizzazione dei predittori tramite scaler stimato sul training set
+- definizione del modulo `torch/luz`
+- griglia di iperparametri Neural Network
+- fitting con `luz`
+- calcolo dell'accuracy sul validation set
+- salvataggio dei risultati di validazione
+- caricamento dei best params
+- training finale del modello
+
+La griglia attuale include combinazioni di:
+
+- `hidden_units`: architettura dei layer hidden, ad esempio `32`, `64`, `64-32`, `128-64`
+- `dropout`: regolarizzazione dropout
+- `learning_rate`: passo dell'ottimizzatore Adam
+- `batch_size`: dimensione dei batch
+- `epochs`: numero di epoche
+- `weight_decay`: regolarizzazione L2
+
+Il training finale salva due artefatti locali:
+
+- un bundle `.rds` con metadati, colonne del design matrix, scaler e best params
+- un file `.luz` con il modello `luz` serializzato correttamente
+
+La separazione e' necessaria per ricaricare in modo affidabile modelli `torch/luz` in una nuova sessione R.
+
 ## Workflow di validazione
 
 Ogni script `validation.R`:
 
 - legge il training set dello scenario
 - legge il validation set dello scenario
-- valuta tutte le combinazioni della griglia BART
+- valuta tutte le combinazioni della griglia del modello corrispondente
 - ordina i risultati per accuracy decrescente
 - salva tutti i risultati in `validation_results_*.csv`
 - salva la migliore combinazione in `best_params_*.csv`
@@ -123,6 +168,14 @@ Comandi:
 source("scripts/modeling/bart/no_selection/validation.R")
 source("scripts/modeling/bart/aic_selection/validation.R")
 source("scripts/modeling/bart/bic_selection/validation.R")
+```
+
+Per Neural Network:
+
+```r
+source("scripts/modeling/neural_network/no_selection/validation.R")
+source("scripts/modeling/neural_network/aic_selection/validation.R")
+source("scripts/modeling/neural_network/bic_selection/validation.R")
 ```
 
 ## Workflow di training finale BART
@@ -143,6 +196,24 @@ source("scripts/modeling/bart/bic_selection/training.R")
 ```
 
 Gli script di training sono indipendenti dagli script di validazione: richiedono solo che il relativo file `best_params_*.csv` esista gia'.
+
+## Workflow di training finale Neural Network
+
+Ogni script `training.R`:
+
+- legge il file `best_params_*.csv` prodotto dalla validazione
+- legge il rispettivo `full_training_set`
+- costruisce e standardizza la matrice dei predittori
+- addestra la rete neurale finale con i migliori parametri
+- salva il bundle `.rds` e il modello `.luz` nella cartella `models/neural_network/`
+
+Comandi:
+
+```r
+source("scripts/modeling/neural_network/no_selection/training.R")
+source("scripts/modeling/neural_network/aic_selection/training.R")
+source("scripts/modeling/neural_network/bic_selection/training.R")
+```
 
 ## Workflow di training finale Naive Bayes
 
@@ -209,12 +280,24 @@ Validazione:
 - `reports/modeling/bart/aic/best_params_aic.csv`
 - `reports/modeling/bart/bic/validation_results_bic.csv`
 - `reports/modeling/bart/bic/best_params_bic.csv`
+- `reports/modeling/neural_network/no_selection/validation_results_no_selection.csv`
+- `reports/modeling/neural_network/no_selection/best_params_no_selection.csv`
+- `reports/modeling/neural_network/aic/validation_results_aic.csv`
+- `reports/modeling/neural_network/aic/best_params_aic.csv`
+- `reports/modeling/neural_network/bic/validation_results_bic.csv`
+- `reports/modeling/neural_network/bic/best_params_bic.csv`
 
 Training finale:
 
 - `models/bart/no_selection/bart_model_no_selection.rds`
 - `models/bart/aic/bart_model_aic.rds`
 - `models/bart/bic/bart_model_bic.rds`
+- `models/neural_network/no_selection/neural_network_model_no_selection.rds`
+- `models/neural_network/no_selection/neural_network_model_no_selection.rds.luz`
+- `models/neural_network/aic/neural_network_model_aic.rds`
+- `models/neural_network/aic/neural_network_model_aic.rds.luz`
+- `models/neural_network/bic/neural_network_model_bic.rds`
+- `models/neural_network/bic/neural_network_model_bic.rds.luz`
 - `models/naive_bayes/no_selection/naive_bayes_model_no_selection.rds`
 - `models/naive_bayes/aic/naive_bayes_model_aic.rds`
 - `models/naive_bayes/bic/naive_bayes_model_bic.rds`
@@ -231,7 +314,7 @@ Grafi struttura:
 - `reports/modeling/tan/aic/tan_network_aic.svg`
 - `reports/modeling/tan/bic/tan_network_bic.svg`
 
-I file `.rds` dei modelli sono artefatti generati e possono essere molto pesanti. Per questo sono esclusi da Git tramite `.gitignore`.
+I file dei modelli sono artefatti generati e possono essere molto pesanti. Per questo l'intera cartella `models/` e' esclusa da Git tramite `.gitignore`.
 
 ## Ordine consigliato
 
@@ -239,6 +322,8 @@ I file `.rds` dei modelli sono artefatti generati e possono essere molto pesanti
 2. Generare le selezioni AIC/BIC con gli script in `scripts/structure_learning/`.
 3. Eseguire la validazione BART per gli scenari desiderati.
 4. Eseguire il training finale BART per gli scenari validati.
-5. Eseguire il training finale Naive Bayes per gli scenari desiderati.
-6. Eseguire il training finale TAN per gli scenari desiderati.
-7. Usare i file in `reports/modeling/bart/` per confrontare le prestazioni di validazione BART.
+5. Eseguire la validazione Neural Network per gli scenari desiderati.
+6. Eseguire il training finale Neural Network per gli scenari validati.
+7. Eseguire il training finale Naive Bayes per gli scenari desiderati.
+8. Eseguire il training finale TAN per gli scenari desiderati.
+9. Usare i file in `reports/modeling/bart/` e `reports/modeling/neural_network/` per confrontare le prestazioni di validazione.
