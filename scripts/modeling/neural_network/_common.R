@@ -354,7 +354,14 @@ train_final_neural_network_model <- function(config, seed = 123) {
     trained_at = Sys.time()
   )
 
-  saveRDS(model_bundle, config$model_path)
+  model_luz_path <- paste0(config$model_path, ".luz")
+  luz_save(model, model_luz_path)
+
+  persisted_model_bundle <- model_bundle
+  persisted_model_bundle$model <- NULL
+  persisted_model_bundle$model_luz_path <- model_luz_path
+
+  saveRDS(persisted_model_bundle, config$model_path)
   cat(
     "Modello Neural Network salvato in:",
     normalizePath(config$model_path, winslash = "/", mustWork = FALSE),

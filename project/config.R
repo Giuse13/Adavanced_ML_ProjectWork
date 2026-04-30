@@ -69,6 +69,7 @@ project_paths <- list(
   neural_network_bic_selection_best_params_path = "reports/modeling/neural_network/bic/best_params_bic.csv",
   evaluation_reports_dir = "reports/evaluation",
   bart_evaluation_results_path = "reports/evaluation/bart_evaluation.csv",
+  neural_network_evaluation_results_path = "reports/evaluation/neural_network_evaluation.csv",
   naive_bayes_evaluation_results_path = "reports/evaluation/naive_bayes_evaluation.csv",
   tan_evaluation_results_path = "reports/evaluation/tan_evaluation.csv",
   dag_aic_dir = "reports/dag/aic",
