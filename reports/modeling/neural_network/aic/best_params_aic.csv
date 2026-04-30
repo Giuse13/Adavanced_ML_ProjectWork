@@ -1,0 +1,2 @@
+"selection","hidden_units","dropout","learning_rate","batch_size","epochs","weight_decay","accuracy"
+"aic_selection","32",0.2,5e-04,128,50,0,0.750106097043429
