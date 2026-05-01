@@ -4,11 +4,11 @@ target_variable <- "Diabetes_binary"
 
 # Griglia condivisa dagli script validation.R dei tre scenari BART.
 default_bart_grid <- expand.grid(
-  ntree = c(30, 50, 100),
-  k = c(1, 2),
-  power = c(2, 3),
+  ntree = c(100, 200, 300),
+  k = c(2),
+  power = c(2),
   base = c(0.95),
-  ndpost = 400,
+  ndpost = 1000,
   nskip = 100
 )
 
