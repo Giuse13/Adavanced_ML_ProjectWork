@@ -89,3 +89,29 @@ Questo dataset:
 È un tipico esempio di dataset **non invasivo**, basato su questionari, utile per studiare il rischio di diabete senza dati medici diretti (es. glicemia). :contentReference[oaicite:6]{index=6}  
 
 ---
+
+
+| Variable                 | Meaning                                                                | Coding                                                     |
+| ------------------------ | ---------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **Diabetes_binary**      | Diabetes status                                                        | 0 = no diabetes; 1 = prediabetes or diabetes               |
+| **HighBP**               | High blood pressure                                                    | 0 = no; 1 = yes                                            |
+| **HighChol**             | High cholesterol                                                       | 0 = no; 1 = yes                                            |
+| **CholCheck**            | Cholesterol check in the last 5 years                                  | 0 = no; 1 = yes                                            |
+| **BMI**                  | Body Mass Index                                                        | Numeric value                                              |
+| **Smoker**               | Smoked at least 100 cigarettes in entire life                          | 0 = no; 1 = yes                                            |
+| **Stroke**               | Ever told they had a stroke                                            | 0 = no; 1 = yes                                            |
+| **HeartDiseaseorAttack** | Coronary heart disease or myocardial infarction                        | 0 = no; 1 = yes                                            |
+| **PhysActivity**         | Physical activity in past 30 days, excluding work                      | 0 = no; 1 = yes                                            |
+| **Fruits**               | Consumes fruit one or more times per day                               | 0 = no; 1 = yes                                            |
+| **Veggies**              | Consumes vegetables one or more times per day                          | 0 = no; 1 = yes                                            |
+| **HvyAlcoholConsump**    | Heavy alcohol consumption                                              | 0 = no; 1 = yes                                            |
+| **AnyHealthcare**        | Has any kind of health care coverage                                   | 0 = no; 1 = yes                                            |
+| **NoDocbcCost**          | Needed to see a doctor in past 12 months but could not because of cost | 0 = no; 1 = yes                                            |
+| **GenHlth**              | Self-rated general health                                              | 1 = excellent; 2 = very good; 3 = good; 4 = fair; 5 = poor |
+| **MentHlth**             | Days of poor mental health in past 30 days                             | 0–30 days                                                  |
+| **PhysHlth**             | Days of poor physical health in past 30 days                           | 0–30 days                                                  |
+| **DiffWalk**             | Serious difficulty walking or climbing stairs                          | 0 = no; 1 = yes                                            |
+| **Sex**                  | Sex of respondent                                                      | 0 = female; 1 = male                                       |
+| **Age**                  | Age category                                                           | 1 = 18–24; …; 13 = 80+                                     |
+| **Education**            |  scale 1-6 1 = Never attended school or only kindergarten 2 = Grades 1 through 8 (Elementary) 3 = Grades 9 through 11 (Some high school) 4 = Grade 12 or GED (High school graduate) 5 = College 1 year to 3 years (Some college or technical school) 6 = College 4 years or more (College graduate)| 1–6 ordinal scale                                          |
+| **Income**               | income scale 1-8 1 = less than $10,000 5 = less than $35,000 8 = $75,000 or more                                                           | 1–8 ordinal scale                                          |
