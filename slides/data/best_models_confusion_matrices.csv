@@ -1,33 +1,49 @@
 "model","selection","actual","predicted","n","selection_label","model_label"
-"BART","aic variable selection","Diabete no","Pred. no",2484,"AIC MB","BART
+"BART","aic variable selection","Diabete no","Pred.
+no",2484,"AIC MB","BART
 AIC MB"
-"BART","aic variable selection","Diabete si","Pred. no",719,"AIC MB","BART
+"BART","aic variable selection","Diabete si","Pred.
+no",719,"AIC MB","BART
 AIC MB"
-"BART","aic variable selection","Diabete no","Pred. si",1033,"AIC MB","BART
+"BART","aic variable selection","Diabete no","Pred.
+si",1033,"AIC MB","BART
 AIC MB"
-"BART","aic variable selection","Diabete si","Pred. si",2834,"AIC MB","BART
+"BART","aic variable selection","Diabete si","Pred.
+si",2834,"AIC MB","BART
 AIC MB"
-"Neural Network","no variable selection","Diabete no","Pred. no",2479,"No selection","Rete neurale
+"Neural Network","no variable selection","Diabete no","Pred.
+no",2479,"No selection","Rete neurale
 No selection"
-"Neural Network","no variable selection","Diabete si","Pred. no",709,"No selection","Rete neurale
+"Neural Network","no variable selection","Diabete si","Pred.
+no",709,"No selection","Rete neurale
 No selection"
-"Neural Network","no variable selection","Diabete no","Pred. si",1038,"No selection","Rete neurale
+"Neural Network","no variable selection","Diabete no","Pred.
+si",1038,"No selection","Rete neurale
 No selection"
-"Neural Network","no variable selection","Diabete si","Pred. si",2844,"No selection","Rete neurale
+"Neural Network","no variable selection","Diabete si","Pred.
+si",2844,"No selection","Rete neurale
 No selection"
-"Naive Bayes","bic variable selection","Diabete no","Pred. no",2542,"BIC MB","Naive Bayes
+"Naive Bayes","bic variable selection","Diabete no","Pred.
+no",2542,"BIC MB","Naive Bayes
 BIC MB"
-"Naive Bayes","bic variable selection","Diabete si","Pred. no",860,"BIC MB","Naive Bayes
+"Naive Bayes","bic variable selection","Diabete si","Pred.
+no",860,"BIC MB","Naive Bayes
 BIC MB"
-"Naive Bayes","bic variable selection","Diabete no","Pred. si",975,"BIC MB","Naive Bayes
+"Naive Bayes","bic variable selection","Diabete no","Pred.
+si",975,"BIC MB","Naive Bayes
 BIC MB"
-"Naive Bayes","bic variable selection","Diabete si","Pred. si",2693,"BIC MB","Naive Bayes
+"Naive Bayes","bic variable selection","Diabete si","Pred.
+si",2693,"BIC MB","Naive Bayes
 BIC MB"
-"TAN","aic variable selection","Diabete no","Pred. no",2451,"AIC MB","TAN
+"TAN","aic variable selection","Diabete no","Pred.
+no",2451,"AIC MB","TAN
 AIC MB"
-"TAN","aic variable selection","Diabete si","Pred. no",743,"AIC MB","TAN
+"TAN","aic variable selection","Diabete si","Pred.
+no",743,"AIC MB","TAN
 AIC MB"
-"TAN","aic variable selection","Diabete no","Pred. si",1066,"AIC MB","TAN
+"TAN","aic variable selection","Diabete no","Pred.
+si",1066,"AIC MB","TAN
 AIC MB"
-"TAN","aic variable selection","Diabete si","Pred. si",2810,"AIC MB","TAN
+"TAN","aic variable selection","Diabete si","Pred.
+si",2810,"AIC MB","TAN
 AIC MB"

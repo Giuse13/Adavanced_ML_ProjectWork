@@ -70,8 +70,25 @@ accuracy_metric <- function(actual, predicted_score, threshold = 0.5) {
   )
 }
 
+get_bart_mc_cores <- function() {
+  configured_cores <- Sys.getenv("BART_MC_CORES", unset = "")
+
+  if (nzchar(configured_cores)) {
+    parsed_cores <- suppressWarnings(as.integer(configured_cores))
+
+    if (!is.na(parsed_cores) && parsed_cores >= 1) {
+      return(parsed_cores)
+    }
+
+    warning("BART_MC_CORES non valido: ", configured_cores, ". Uso mc.cores = 1.")
+  }
+
+  1L
+}
+
 fit_gbart <- function(x_train, y_train, x_test = NULL, params, seed) {
   set.seed(seed)
+  mc_cores <- get_bart_mc_cores()
 
   # type = "pbart" usa BART per classificazione binaria con output probabilistico.
   args <- list(
@@ -86,12 +103,15 @@ fit_gbart <- function(x_train, y_train, x_test = NULL, params, seed) {
     nskip = params$nskip,
     keepevery = 1,
     seed = seed,
-    printevery = 100
+    printevery = 100,
+    mc.cores = mc_cores
   )
 
   if (!is.null(x_test)) {
     args$x.test <- x_test
   }
+
+  cat("BART mc.cores =", mc_cores, "\n")
 
   do.call(gbart, args)
 }

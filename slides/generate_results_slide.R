@@ -132,6 +132,16 @@ read_accuracy_data <- function(path) {
   long_data$model_label <- model_labels[as.character(long_data$model)]
   long_data$selection_label <- selection_labels[as.character(long_data$selection)]
   long_data$accuracy_label <- sprintf("%.2f%%", 100 * long_data$accuracy)
+  long_data$selection_x <- match(as.character(long_data$selection), selection_levels)
+  long_data$model_y <- match(as.character(long_data$model), rev(model_levels))
+
+  accuracy_range <- range(long_data$accuracy, na.rm = TRUE)
+  if (diff(accuracy_range) == 0) {
+    long_data$accuracy_scaled <- 0.5
+  } else {
+    long_data$accuracy_scaled <- (long_data$accuracy - accuracy_range[1]) / diff(accuracy_range)
+  }
+
   long_data
 }
 
@@ -335,7 +345,7 @@ build_confusion_data <- function(best_scenarios) {
   }
 
   confusion_data$actual <- factor(confusion_data$actual, levels = c("1", "0"), labels = c("Diabete si", "Diabete no"))
-  confusion_data$predicted <- factor(confusion_data$predicted, levels = c("0", "1"), labels = c("Pred. no", "Pred. si"))
+  confusion_data$predicted <- factor(confusion_data$predicted, levels = c("0", "1"), labels = c("Pred.\nno", "Pred.\nsi"))
   confusion_data$model <- factor(confusion_data$model, levels = model_levels)
   confusion_data$selection_label <- selection_labels[confusion_data$selection]
   confusion_data$model_label <- paste0(model_labels[as.character(confusion_data$model)], "\n", confusion_data$selection_label)
@@ -345,23 +355,61 @@ build_confusion_data <- function(best_scenarios) {
 create_accuracy_heatmap <- function(accuracy_data) {
   ggplot(
     accuracy_data,
-    aes(x = selection, y = model, fill = accuracy)
+    aes(x = selection_x, y = model_y)
   ) +
-    geom_tile(color = background_color, linewidth = 1.8, width = 0.96, height = 0.90) +
+    geom_tile(aes(fill = accuracy_scaled), color = background_color, linewidth = 1.8, width = 0.96, height = 0.90) +
     geom_text(aes(label = accuracy_label), family = font_family, fontface = "bold", size = 5.2, color = text_color) +
-    scale_x_discrete(labels = selection_labels, position = "top") +
-    scale_y_discrete(labels = function(values) model_labels[values]) +
-    scale_fill_gradient(low = secondary_color, high = primary_color, guide = "none") +
+    geom_text(
+      data = unique(accuracy_data[, c("model_y", "model_label")]),
+      aes(x = 0.45, y = model_y, label = model_label),
+      inherit.aes = FALSE,
+      family = font_family,
+      size = 4.7,
+      hjust = 1,
+      color = text_color
+    ) +
+    geom_text(
+      data = data.frame(selection_x = 1:3, selection_label = unname(selection_labels[selection_levels])),
+      aes(x = selection_x, y = 4.72, label = selection_label),
+      inherit.aes = FALSE,
+      family = font_family,
+      fontface = "bold",
+      size = 4.7,
+      color = text_color
+    ) +
+    scale_x_continuous(limits = c(-0.85, 3.55), expand = c(0, 0)) +
+    scale_y_continuous(limits = c(0.55, 4.9), expand = c(0, 0)) +
+    scale_fill_gradient(low = "#f2e8df", high = primary_color, limits = c(0, 1), guide = "none") +
     labs(title = "Accuracy sul test set", x = NULL, y = NULL) +
     theme_minimal(base_family = font_family) +
     theme(
       plot.background = element_rect(fill = background_color, color = NA),
       panel.background = element_rect(fill = background_color, color = NA),
       panel.grid = element_blank(),
-      axis.text.x = element_text(color = text_color, size = 13, face = "bold", margin = margin(b = 8)),
-      axis.text.y = element_text(color = text_color, size = 13),
-      plot.title = element_text(color = text_color, size = 22, face = "bold", hjust = 0.5, margin = margin(b = 14)),
-      plot.margin = margin(8, 40, 10, 40)
+      axis.text = element_blank(),
+      plot.title = element_text(color = text_color, size = 20, face = "bold", hjust = 0.5, margin = margin(b = 10)),
+      plot.margin = margin(34, 12, 18, 42)
+    )
+}
+
+create_confusion_title <- function() {
+  ggplot() +
+    annotate(
+      "text",
+      x = 0.5,
+      y = 0.5,
+      label = "Matrici di confusione per i 4 modelli migliori",
+      family = font_family,
+      fontface = "bold",
+      size = 5.7,
+      color = text_color
+    ) +
+    coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), clip = "off") +
+    theme_void(base_family = font_family) +
+    theme(
+      plot.background = element_rect(fill = background_color, color = NA),
+      panel.background = element_rect(fill = background_color, color = NA),
+      plot.margin = margin(0, 0, 0, 0)
     )
 }
 
@@ -371,18 +419,19 @@ create_confusion_plot <- function(confusion_data, model_name) {
 
   ggplot(model_data, aes(x = predicted, y = actual, fill = n)) +
     geom_tile(color = background_color, linewidth = 1.4, width = 0.92, height = 0.92) +
-    geom_text(aes(label = n), family = font_family, fontface = "bold", size = 4.6, color = text_color) +
+    geom_text(aes(label = n), family = font_family, fontface = "plain", size = 3.9, color = text_color) +
     scale_fill_gradient(low = muted_color, high = primary_color, guide = "none") +
     labs(title = model_title, x = NULL, y = NULL) +
+    coord_fixed(ratio = 1, clip = "off") +
     theme_minimal(base_family = font_family) +
     theme(
       plot.background = element_rect(fill = background_color, color = NA),
       panel.background = element_rect(fill = background_color, color = NA),
       panel.grid = element_blank(),
-      axis.text.x = element_text(color = text_color, size = 10.5),
-      axis.text.y = element_text(color = text_color, size = 10.5),
-      plot.title = element_text(color = text_color, size = 14, face = "bold", hjust = 0.5, margin = margin(b = 7)),
-      plot.margin = margin(6, 12, 6, 12)
+      axis.text.x = element_text(color = text_color, size = 8.4, lineheight = 0.84),
+      axis.text.y = element_text(color = text_color, size = 8.4),
+      plot.title = element_text(color = text_color, size = 11.5, face = "bold", hjust = 0.5, margin = margin(b = 3)),
+      plot.margin = margin(2, 6, 2, 6)
     )
 }
 
@@ -393,34 +442,25 @@ confusion_data <- build_confusion_data(best_scenarios)
 write.csv(confusion_data, confusion_output_path, row.names = FALSE)
 
 heatmap_plot <- create_accuracy_heatmap(accuracy_data)
+confusion_title <- create_confusion_title()
 confusion_plots <- lapply(model_levels, function(model_name) {
   create_confusion_plot(confusion_data, model_name)
 })
 
-slide_plot <- heatmap_plot /
-  wrap_plots(confusion_plots, nrow = 1) +
-  plot_layout(heights = c(0.56, 0.44)) +
+confusion_grid <- wrap_plots(confusion_plots, ncol = 2) +
+  plot_layout(widths = c(1, 1), heights = c(1, 1))
+
+confusion_panel <- confusion_title /
+  confusion_grid +
+  plot_layout(heights = c(0.10, 0.90))
+
+slide_plot <- heatmap_plot |
+  confusion_panel +
+  plot_layout(widths = c(0.48, 0.52)) +
   plot_annotation(
-    title = "Risultati finali dei modelli",
-    subtitle = "Confronto accuracy per scenario di selezione e confusion matrix dello scenario migliore per ciascun modello",
     caption = "Le confusion matrix usano i migliori scenari per modello: BART=AIC, Rete neurale=no selection, Naive Bayes=BIC, TAN=AIC.",
     theme = theme(
       plot.background = element_rect(fill = background_color, color = NA),
-      plot.title = element_text(
-        family = font_family,
-        color = text_color,
-        size = 34,
-        face = "bold",
-        hjust = 0.5,
-        margin = margin(t = 26, b = 6)
-      ),
-      plot.subtitle = element_text(
-        family = font_family,
-        color = text_color,
-        size = 14,
-        hjust = 0.5,
-        margin = margin(b = 4)
-      ),
       plot.caption = element_text(
         family = font_family,
         color = text_color,
